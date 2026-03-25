@@ -1,7 +1,7 @@
 package com.onlinelearning.auth.controller;
 
 import com.onlinelearning.auth.dto.*;
-import com.onlinelearning.auth.service.AuthService;
+import com.onlinelearning.auth.service.impl.AuthServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Auth Service", description = "OAuth 2.0 Authentication - Register, Login, Logout, Token Introspection")
 public class AuthController {
 
-    private final AuthService authService;
+    private final AuthServiceImpl authServiceImpl;
 
     // ==================== REGISTER ====================
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user", description = "Creates a new STUDENT or INSTRUCTOR account and returns an access token")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        AuthResponse response = authService.register(request);
+        AuthResponse response = authServiceImpl.register(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -32,7 +32,7 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "Login", description = "Authenticates the user and returns an opaque access token")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        AuthResponse response = authService.login(request);
+        AuthResponse response = authServiceImpl.login(request);
         return ResponseEntity.ok(response);
     }
 
@@ -42,7 +42,7 @@ public class AuthController {
     @Operation(summary = "Logout", description = "Revokes the access token so it can no longer be used")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {
         String token = extractToken(authHeader);
-        String message = authService.logout(token);
+        String message = authServiceImpl.logout(token);
         return ResponseEntity.ok(message);
     }
 
@@ -52,7 +52,7 @@ public class AuthController {
     @PostMapping("/introspect")
     @Operation(summary = "Introspect token", description = "Called by API Gateway to validate a token and get user details")
     public ResponseEntity<IntrospectResponse> introspect(@Valid @RequestBody IntrospectRequest request) {
-        IntrospectResponse response = authService.introspect(request);
+        IntrospectResponse response = authServiceImpl.introspect(request);
         return ResponseEntity.ok(response);
     }
 
@@ -62,7 +62,7 @@ public class AuthController {
     @Operation(summary = "Get current user profile", description = "Returns the profile of the currently logged-in user based on the token")
     public ResponseEntity<ProfileResponse> getProfile(@RequestHeader("Authorization") String authHeader) {
         String token = extractToken(authHeader);
-        ProfileResponse response = authService.getProfile(token);
+        ProfileResponse response = authServiceImpl.getProfile(token);
         return ResponseEntity.ok(response);
     }
 

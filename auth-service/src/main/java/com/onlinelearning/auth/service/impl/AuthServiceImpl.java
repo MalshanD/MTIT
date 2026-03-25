@@ -1,4 +1,4 @@
-package com.onlinelearning.auth.service;
+package com.onlinelearning.auth.service.impl;
 
 import com.onlinelearning.auth.dto.*;
 import com.onlinelearning.auth.entity.*;
@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class AuthServiceImpl {
 
     private final UserRepository userRepository;
     private final AccessTokenRepository accessTokenRepository;
