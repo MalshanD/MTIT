@@ -1,0 +1,6 @@
+com\onlinelearning\gateway\config\WebClientConfig.class
+com\onlinelearning\gateway\config\SwaggerConfig.class
+com\onlinelearning\gateway\dto\IntrospectResponse$IntrospectResponseBuilder.class
+com\onlinelearning\gateway\dto\IntrospectResponse.class
+com\onlinelearning\gateway\filter\AuthenticationFilter.class
+com\onlinelearning\gateway\ApiGatewayApplication.class

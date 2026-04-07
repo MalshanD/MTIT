@@ -1,0 +1,17 @@
+com\onlinelearning\instructor\dto\InstructorResponse$InstructorResponseBuilder.class
+com\onlinelearning\instructor\dto\ReviewResponse.class
+com\onlinelearning\instructor\repository\InstructorReviewRepository.class
+com\onlinelearning\instructor\dto\InstructorRequest.class
+com\onlinelearning\instructor\entity\InstructorReview$InstructorReviewBuilder.class
+com\onlinelearning\instructor\dto\ReviewRequest.class
+com\onlinelearning\instructor\service\InstructorService.class
+com\onlinelearning\instructor\config\SwaggerConfig.class
+com\onlinelearning\instructor\entity\Instructor$InstructorBuilder.class
+com\onlinelearning\instructor\InstructorServiceApplication.class
+com\onlinelearning\instructor\controller\InstructorController.class
+com\onlinelearning\instructor\exception\GlobalExceptionHandler.class
+com\onlinelearning\instructor\dto\InstructorResponse.class
+com\onlinelearning\instructor\dto\ReviewResponse$ReviewResponseBuilder.class
+com\onlinelearning\instructor\entity\Instructor.class
+com\onlinelearning\instructor\entity\InstructorReview.class
+com\onlinelearning\instructor\repository\InstructorRepository.class

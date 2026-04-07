@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LearnHub - System Architecture &amp; Technical Documentation</title>
+<style>
+  :root {
+    --primary: #1e40af;
+    --primary-light: #3b82f6;
+    --primary-bg: #eff6ff;
+    --secondary: #059669;
+    --secondary-bg: #ecfdf5;
+    --accent: #7c3aed;
+    --accent-bg: #f5f3ff;
+    --warning: #d97706;
+    --warning-bg: #fffbeb;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-500: #6b7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --auth: #ef4444;
+    --student: #3b82f6;
+    --course: #10b981;
+    --instructor: #8b5cf6;
+    --enrollment: #f59e0b;
+    --quiz: #ec4899;
+    --certificate: #06b6d4;
+    --gateway: #1e40af;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--gray-900);
+    line-height: 1.6;
+    background: #f8fafc;
+  }
+
+  /* COVER PAGE */
+  .cover {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #1e40af 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(59,130,246,0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(124,58,237,0.1) 0%, transparent 40%);
+    animation: coverPulse 8s ease-in-out infinite alternate;
+  }
+  @keyframes coverPulse {
+    0% { transform: scale(1) rotate(0deg); }
+    100% { transform: scale(1.05) rotate(2deg); }
+  }
+  .cover-content { position: relative; z-index: 1; }
+  .cover h1 { font-size: 3.2rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+  .cover .subtitle { font-size: 1.5rem; font-weight: 300; opacity: 0.9; margin-bottom: 30px; }
+  .cover .meta { font-size: 1rem; opacity: 0.7; margin-top: 40px; }
+  .cover .badge-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+  .cover .badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    backdrop-filter: blur(4px);
+  }
+
+  /* NAV */
+  .toc {
+    background: white;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 16px 40px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .toc-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .toc a {
+    color: var(--gray-700);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .toc a:hover { background: var(--primary-bg); color: var(--primary); }
+  .toc .logo { font-weight: 700; color: var(--primary); font-size: 1rem; margin-right: 16px; }
+
+  /* SECTIONS */
+  .container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
+  section {
+    background: white;
+    border-radius: 16px;
+    padding: 48px;
+    margin: 24px auto;
+    max-width: 1400px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border: 1px solid var(--gray-100);
+  }
+  h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  h2 .icon { font-size: 1.4rem; }
+  .section-desc { color: var(--gray-500); margin-bottom: 32px; font-size: 0.95rem; }
+  h3 { font-size: 1.25rem; font-weight: 600; color: var(--gray-900); margin: 28px 0 12px; }
+  h4 { font-size: 1.05rem; font-weight: 600; color: var(--gray-700); margin: 20px 0 8px; }
+  p { margin-bottom: 12px; color: var(--gray-700); }
+
+  /* TABLES */
+  .table-wrap { overflow-x: auto; margin: 16px 0; border-radius: 10px; border: 1px solid var(--gray-200); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th {
+    background: var(--gray-50);
+    color: var(--gray-700);
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--gray-200);
+    white-space: nowrap;
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: top;
+  }
+  tr:hover td { background: var(--gray-50); }
+  code {
+    background: var(--gray-100);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+  }
+
+  /* METHOD BADGES */
+  .method {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    min-width: 52px;
+    text-align: center;
+  }
+  .method.get { background: #dbeafe; color: #1d4ed8; }
+  .method.post { background: #dcfce7; color: #166534; }
+  .method.put { background: #fef3c7; color: #92400e; }
+  .method.delete { background: #fee2e2; color: #991b1b; }
+
+  /* ROLE BADGES */
+  .role {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    margin: 1px 2px;
+  }
+  .role.student { background: #dbeafe; color: #1e40af; }
+  .role.instructor { background: #f3e8ff; color: #6d28d9; }
+  .role.admin { background: #fee2e2; color: #991b1b; }
+  .role.any { background: #e0e7ff; color: #3730a3; }
+  .role.public { background: #dcfce7; color: #166534; }
+  .role.system { background: #fef3c7; color: #92400e; }
+
+  /* SERVICE COLORS */
+  .svc-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .svc-auth { background: #fee2e2; color: #991b1b; }
+  .svc-student { background: #dbeafe; color: #1e40af; }
+  .svc-course { background: #dcfce7; color: #166534; }
+  .svc-instructor { background: #f3e8ff; color: #6d28d9; }
+  .svc-enrollment { background: #fef3c7; color: #92400e; }
+  .svc-quiz { background: #fce7f3; color: #9d174d; }
+  .svc-certificate { background: #cffafe; color: #0e7490; }
+  .svc-gateway { background: #e0e7ff; color: #3730a3; }
+
+  /* INFO CARDS */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .card {
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 20px;
+    background: white;
+    transition: box-shadow 0.2s;
+  }
+  .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .card-header .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .card-header h4 { margin: 0; font-size: 1rem; }
+  .card p { font-size: 0.88rem; color: var(--gray-500); margin: 0 0 8px; }
+  .card .detail { font-size: 0.82rem; color: var(--gray-700); }
+  .card .detail strong { color: var(--gray-900); }
+
+  /* DIAGRAMS */
+  .diagram-container {
+    margin: 24px 0;
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+  }
+  .diagram-title {
+    background: var(--gray-50);
+    padding: 12px 20px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .diagram-body { padding: 24px; overflow-x: auto; }
+
+  /* SVG DIAGRAMS */
+  svg text { font-family: 'Segoe UI', system-ui, sans-serif; }
+
+  /* KEY VALUE */
+  .kv { display: flex; gap: 8px; margin: 4px 0; font-size: 0.88rem; }
+  .kv .k { color: var(--gray-500); min-width: 110px; font-weight: 500; }
+  .kv .v { color: var(--gray-900); }
+
+  /* STAT ROW */
+  .stat-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+  .stat {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 16px 24px;
+    text-align: center;
+    min-width: 130px;
+  }
+  .stat .num { font-size: 2rem; font-weight: 700; color: var(--primary); }
+  .stat .label { font-size: 0.82rem; color: var(--gray-500); margin-top: 4px; }
+
+  /* OWNERSHIP BADGE */
+  .own-badge {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    font-size: 0.7rem;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+
+  /* PRINT */
+  @media print {
+    .cover { min-height: auto; padding: 60px 40px; }
+    .toc { position: static; }
+    section { break-inside: avoid; box-shadow: none; }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    section { padding: 24px 16px; margin: 12px; }
+    .cover h1 { font-size: 2rem; }
+    .card-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ER DIAGRAM STYLES */
+  .er-entity {
+    fill: white;
+    stroke: var(--gray-300);
+    stroke-width: 1.5;
+    rx: 8;
+    ry: 8;
+  }
+  .er-header {
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .er-field {
+    font-size: 11px;
+    fill: var(--gray-700);
+  }
+  .er-pk {
+    font-weight: 600;
+    fill: var(--primary);
+  }
+  .er-fk {
+    font-style: italic;
+    fill: var(--accent);
+  }
+  .er-relation {
+    stroke: var(--gray-300);
+    stroke-width: 1.5;
+    fill: none;
+    marker-end: url(#arrowhead);
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- COVER PAGE -->
+<!-- ============================================================ -->
+<div class="cover">
+  <div class="cover-content">
+    <h1>LearnHub Online Learning Platform</h1>
+    <div class="subtitle">System Architecture &amp; Technical Documentation</div>
+    <div class="badge-row">
+      <span class="badge">Microservices</span>
+      <span class="badge">Spring Boot 3</span>
+      <span class="badge">Spring Cloud Gateway</span>
+      <span class="badge">MySQL 8</span>
+      <span class="badge">OAuth 2.0</span>
+      <span class="badge">REST API</span>
+      <span class="badge">Docker</span>
+    </div>
+    <div class="badge-row">
+      <span class="badge">8 Services</span>
+      <span class="badge">62 Endpoints</span>
+      <span class="badge">7 Databases</span>
+      <span class="badge">3 User Roles</span>
+    </div>
+    <div class="meta">
+      IT4020: Modern Topics in IT &mdash; SLIIT<br>
+      Generated: April 2026 | Version 1.0
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TABLE OF CONTENTS NAV -->
+<!-- ============================================================ -->
+<nav class="toc">
+  <div class="toc-inner">
+    <span class="logo">LearnHub Docs</span>
+    <a href="#overview">Overview</a>
+    <a href="#services">Services</a>
+    <a href="#endpoints">Endpoints</a>
+    <a href="#relationships">Relationships</a>
+    <a href="#rbac">RBAC</a>
+    <a href="#arch-diagram">Architecture</a>
+    <a href="#er-diagrams">ER Diagrams</a>
+    <a href="#svc-diagrams">Service Diagrams</a>
+  </div>
+</nav>
+
+<!-- ============================================================ -->
+<!-- 1. SYSTEM OVERVIEW -->
+<!-- ============================================================ -->
+<div class="container">
+<section id="overview">
+  <h2><span class="icon">1.</span> System Overview</h2>
+  <p class="section-desc">High-level understanding of the platform's purpose, stack, and architecture</p>
+
+  <h3>1.1 Purpose &amp; Domain</h3>
+  <p>LearnHub is a full-featured Online Learning Platform that enables instructors to create and publish courses, students to enroll and learn at their own pace, and administrators to manage the entire ecosystem. The platform supports course content management with lessons, quizzes with auto-grading, progress tracking, enrollment lifecycle management, certificate issuance upon course completion, and instructor review/rating systems.</p>
+
+  <h3>1.2 Architectural Pattern</h3>
+  <p>The system follows a <strong>Microservices Architecture</strong> with an API Gateway pattern. Each business domain is isolated into its own independently deployable service with a dedicated database (Database-per-Service pattern). All client traffic flows through a single API Gateway that handles authentication, routing, and CORS. Inter-service communication is synchronous via REST (RestTemplate).</p>
+
+  <h3>1.3 Technology Stack</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Layer</th><th>Technology</th><th>Details</th></tr>
+      <tr><td>Gateway</td><td>Spring Cloud Gateway</td><td>Reactive/Netty-based, port 8080. Path-based routing to 7 backend services.</td></tr>
+      <tr><td>Backend</td><td>Spring Boot 3.x</td><td>Java 17+, Jakarta EE, each service is an independent Spring Boot application.</td></tr>
+      <tr><td>ORM</td><td>Spring Data JPA / Hibernate</td><td>JPA entities with auto-DDL update. Repository pattern.</td></tr>
+      <tr><td>Database</td><td>MySQL 8.0</td><td>7 separate schemas (auth_db, student_db, course_db, instructor_db, enrollment_db, quiz_db, certificate_db). Shared MySQL instance.</td></tr>
+      <tr><td>Auth</td><td>Custom OAuth 2.0 (Opaque Tokens)</td><td>UUID-based tokens stored in DB. Token introspection via Auth Service. 24-hour expiry.</td></tr>
+      <tr><td>API Docs</td><td>SpringDoc OpenAPI 3 + Swagger UI</td><td>Each service exposes /v3/api-docs. Gateway aggregates via custom Swagger UI (CDN-loaded).</td></tr>
+      <tr><td>Build</td><td>Maven</td><td>Multi-module Maven project.</td></tr>
+      <tr><td>Container</td><td>Docker / Docker Compose</td><td>MySQL runs in Docker. Services run on host (development mode).</td></tr>
+      <tr><td>Frontend</td><td>React (Node.js)</td><td>Separate frontend application consuming the API Gateway.</td></tr>
+      <tr><td>Inter-Service</td><td>RestTemplate (Synchronous REST)</td><td>Used by Enrollment, Quiz, and Certificate services for cross-service calls.</td></tr>
+    </table>
+  </div>
+
+  <h3>1.4 Key Statistics</h3>
+  <div class="stat-row">
+    <div class="stat"><div class="num">8</div><div class="label">Total Services</div></div>
+    <div class="stat"><div class="num">7</div><div class="label">Databases</div></div>
+    <div class="stat"><div class="num">62</div><div class="label">API Endpoints</div></div>
+    <div class="stat"><div class="num">3</div><div class="label">User Roles</div></div>
+    <div class="stat"><div class="num">19</div><div class="label">Entity Classes</div></div>
+    <div class="stat"><div class="num">6</div><div class="label">Inter-Service Links</div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 2. SERVICE MAPPING -->
+<!-- ============================================================ -->
+<section id="services">
+  <h2><span class="icon">2.</span> Service Mapping</h2>
+  <p class="section-desc">Detailed breakdown of each service's responsibility, port, and dependencies</p>
+
+  <div class="card-grid">
+    <!-- API Gateway -->
+    <div class="card" style="border-left: 4px solid var(--gateway);">
+      <div class="card-header">
+        <div class="dot" style="background: var(--gateway);"></div>
+        <h4>API Gateway</h4>
+        <span class="svc-tag svc-gateway">INFRASTRUCTURE</span>
+      </div>
+      <p>Single entry point for all client requests. Handles authentication, routing, CORS, and Swagger UI aggregation.</p>
+      <div class="kv"><span class="k">Port:</span><span class="v">8080</span></div>
+      <div class="kv"><span class="k">Base URL:</span><span class="v">http://localhost:8080</span></div>
+      <div class="kv"><span class="k">Framework:</span><span class="v">Spring Cloud Gateway (Reactive/Netty)</span></div>
+      <div class="kv"><span class="k">Classification:</span><span class="v">Infrastructure (External-facing)</span></div>
+      <div class="kv"><span class="k">Dependencies:</span><span class="v">Auth Service (token introspection)</span></div>
+      <div class="kv"><span class="k">Protocol:</span><span class="v">HTTP REST (Proxy)</span></div>
+    </div>
+
+    <!-- Auth Service -->
+    <div class="card" style="border-left: 4px solid var(--auth);">
+      <div class="card-header">
+        <div class="dot" style="background: var(--auth);"></div>
+        <h4>Auth Service</h4>
+        <span class="svc-tag svc-auth">SECURITY</span>
+      </div>
+      <p>Manages user registration, login/logout, opaque token generation, and token introspection for the Gateway.</p>
+      <div class="kv"><span class="k">Port:</span><span class="v">8081</span></div>
+      <div class="kv"><span class="k">Base URL:</span><span class="v">http://localhost:8081/api/auth</span></div>
+      <div class="kv"><span class="k">Database:</span><span class="v">auth_db (users, access_tokens)</span></div>
+      <div class="kv"><span class="k">Classification:</span><span class="v">Internal (called by Gateway)</span></div>
+      <div class="kv"><span class="k">Dependencies:</span><span class="v">None (standalone)</span></div>
+      <div class="kv"><span class="k">Protocol:</span><span class="v">Synchronous REST</span></div>
+    </div>
+
+    <!-- Student Service -->
+    <div class="card" style="border-left: 4px solid var(--student);">
+      <div class="card-header">
+        <div class="dot" style="background: var(--student);"></div>
+        <h4>Student Service</h4>
+        <span class="svc-tag svc-student">DOMAIN</span>
+      </div>
+      <p>Manages student profiles, biographical data, and per-course progress tracking (completed lessons, percentages).</p>
+      <div class="kv"><span class="k">Port:</span><span class="v">8082</span></div>
+      <div class="kv"><span class="k">Base URL:</span><span class="v">http://localhost:8082/api/students</span></div>
+      <div class="kv"><span class="k">Database:</span><span class="v">student_db (students, student_progress)</span></div>
+      <div class="kv"><span class="k">Classification:</span><span class="v">Internal (domain service)</span></div>
+      <div class="kv"><span class="k">Dependencies:</span><span class="v">None (called by Enrollment, Certificate)</span></div>
+      <div class="kv"><span class="k">Protocol:</span><span class="v">Synchronous REST</span></div>
+    </div>
+
+    <!-- Course Service -->
+    <div class="card" style="border-left: 4px solid var(--course);">
+      <div class="card-header">
+        <div class="dot" style="background: var(--course);"></div>
+        <h4>Course Service</h4>
+        <span class="svc-tag svc-course">DOMAIN</span>
+      </div>
+      <p>Manages courses, lessons (video content), categories, publishing workflow, and course search/discovery.</p>
+      <div class="kv"><span class="k">Port:</span><span class="v">8083</span></div>
+      <div class="kv"><span class="k">Base URL:</span><span class="v">http://localhost:8083/api/courses</span></div>
+      <div class="kv"><span class="k">Database:</span><span class="v">course_db (courses, lessons, course_categories)</span></div>
+      <div class="kv"><span class="k">Classification:</span><span class="v">Internal (domain service)</span></div>
+      <div class="kv"><span class="k">Dependencies:</span><span class="v">None (called by Enrollment, Certificate)</span></div>
+      <div class="kv"><span class="k">Protocol:</span><span class="v">Synchronous REST</span></div>
+    </div>
+
+    <!-- Instructor Service -->
+    <div class="card" style="border-left: 4px solid var(--instructor);">
+      <div class="card-header">
+        <div class="dot" style="background: var(--instructor);"></div>
+        <h4>Instructor Service</h4>
+        <span class="svc-tag svc-instructor">DOMAIN</span>
+      </div>
+      <p>Manages instructor profiles (bio, expertise, LinkedIn), student reviews/ratings, and instructor verification status.</p>
+      <div class="kv"><span class="k">Port:</span><span class="v">8084</span></div>
+      <div class="kv"><span class="k">Base URL:</span><span class="v">http://localhost:8084/api/instructors</span></div>
+      <div class="kv"><span class="k">Database:</span><span class="v">instructor_db (instructors, instructor_reviews)</span></div>
+      <div class="kv"><span class="k">Classification:</span><span class="v">Internal (domain service)</span></div>
+      <div class="kv"><span class="k">Dependencies:</span><span class="v">None (called by Certificate)</span></div>
+      <div class="kv"><span class="k">Protocol:</span><span class="v">Synchronous REST</span></div>
+    </div>
+
+    <!-- Enrollment Service -->
+    <div class="card" style="border-left: 4px solid var(--enrollment);">
+      <div class="card-header">
+        <div class="dot" style="background: var(--enrollment);"></div>
+        <h4>Enrollment Service</h4>
+        <span class="svc-tag svc-enrollment">DOMAIN</span>
+      </div>
+      <p>Manages the enrollment lifecycle (enroll, complete, drop), payment tracking, wishlist management, and triggers certificate issuance on completion.</p>
+      <div class="kv"><span class="k">Port:</span><span class="v">8085</span></div>
+      <div class="kv"><span class="k">Base URL:</span><span class="v">http://localhost:8085/api/enrollments</span></div>
+      <div class="kv"><span class="k">Database:</span><span class="v">enrollment_db (enrollments, wishlists)</span></div>
+      <div class="kv"><span class="k">Classification:</span><span class="v">Internal (orchestrator)</span></div>
+      <div class="kv"><span class="k">Dependencies:</span><span class="v">Student Service, Course Service, Certificate Service</span></div>
+      <div class="kv"><span class="k">Protocol:</span><span class="v">Synchronous REST (RestTemplate)</span></div>
+    </div>
+
+    <!-- Quiz Service -->
+    <div class="card" style="border-left: 4px solid var(--quiz);">
+      <div class="card-header">
+        <div class="dot" style="background: var(--quiz);"></div>
+        <h4>Quiz Service</h4>
+        <span class="svc-tag svc-quiz">DOMAIN</span>
+      </div>
+      <p>Manages quiz creation, multiple-choice questions (A/B/C/D), auto-grading of student submissions, and triggers enrollment completion when quiz is passed.</p>
+      <div class="kv"><span class="k">Port:</span><span class="v">8086</span></div>
+      <div class="kv"><span class="k">Base URL:</span><span class="v">http://localhost:8086/api/quizzes</span></div>
+      <div class="kv"><span class="k">Database:</span><span class="v">quiz_db (quizzes, questions, quiz_attempts)</span></div>
+      <div class="kv"><span class="k">Classification:</span><span class="v">Internal (domain service)</span></div>
+      <div class="kv"><span class="k">Dependencies:</span><span class="v">Enrollment Service</span></div>
+      <div class="kv"><span class="k">Protocol:</span><span class="v">Synchronous REST (RestTemplate)</span></div>
+    </div>
+
+    <!-- Certificate Service -->
+    <div class="card" style="border-left: 4px solid var(--certificate);">
+      <div class="card-header">
+        <div class="dot" style="background: var(--certificate);"></div>
+        <h4>Certificate Service</h4>
+        <span class="svc-tag svc-certificate">DOMAIN</span>
+      </div>
+      <p>Issues certificates upon course completion, generates unique certificate codes (CERT-YYYY-NNNN), and provides public verification. Fetches student/course names from other services.</p>
+      <div class="kv"><span class="k">Port:</span><span class="v">8087</span></div>
+      <div class="kv"><span class="k">Base URL:</span><span class="v">http://localhost:8087/api/certificates</span></div>
+      <div class="kv"><span class="k">Database:</span><span class="v">certificate_db (certificates)</span></div>
+      <div class="kv"><span class="k">Classification:</span><span class="v">Internal (domain service)</span></div>
+      <div class="kv"><span class="k">Dependencies:</span><span class="v">Student Service, Course Service</span></div>
+      <div class="kv"><span class="k">Protocol:</span><span class="v">Synchronous REST (RestTemplate)</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 3. ENDPOINT MAPPING -->
+<!-- ============================================================ -->
+<section id="endpoints">
+  <h2><span class="icon">3.</span> Complete Endpoint Mapping</h2>
+  <p class="section-desc">Every API endpoint across all services with method, path, description, authentication requirements, and allowed roles</p>
+
+  <!-- AUTH SERVICE -->
+  <h3>3.1 Auth Service <span class="svc-tag svc-auth">:8081</span></h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Method</th><th>Path</th><th>Description</th><th>Auth?</th><th>Roles Allowed</th></tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/auth/register</code></td>
+        <td>Register a new user (STUDENT or INSTRUCTOR)</td>
+        <td>No</td>
+        <td><span class="role public">PUBLIC</span></td>
+      </tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/auth/login</code></td>
+        <td>Authenticate user, returns opaque access token</td>
+        <td>No</td>
+        <td><span class="role public">PUBLIC</span></td>
+      </tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/auth/logout</code></td>
+        <td>Revoke the access token</td>
+        <td>Yes (Bearer)</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+      </tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/auth/introspect</code></td>
+        <td>Validate token and return user details (Gateway internal)</td>
+        <td>No</td>
+        <td><span class="role system">SYSTEM (Gateway)</span></td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/auth/profile</code></td>
+        <td>Get current user profile from token</td>
+        <td>Yes (Bearer)</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- STUDENT SERVICE -->
+  <h3>3.2 Student Service <span class="svc-tag svc-student">:8082</span></h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Method</th><th>Path</th><th>Description</th><th>Auth?</th><th>Roles Allowed</th><th>Ownership</th></tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/students</code></td>
+        <td>Create student profile</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span> <span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/students/{studentId}</code></td>
+        <td>Get student by ID</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span> <span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td><span class="own-badge">OWN ONLY</span> for STUDENT</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/students</code></td>
+        <td>Get all students</td>
+        <td>Yes</td>
+        <td><span class="role admin">ADMIN</span> <span class="role instructor">INSTRUCTOR</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method put">PUT</span></td>
+        <td><code>/api/students/{studentId}</code></td>
+        <td>Update student profile</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span> <span class="role admin">ADMIN</span></td>
+        <td><span class="own-badge">OWN ONLY</span> for STUDENT</td>
+      </tr>
+      <tr>
+        <td><span class="method delete">DELETE</span></td>
+        <td><code>/api/students/{studentId}</code></td>
+        <td>Deactivate student account</td>
+        <td>Yes</td>
+        <td><span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/students/{studentId}/exists</code></td>
+        <td>Check if student exists (inter-service)</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/students/{studentId}/progress</code></td>
+        <td>Create/update progress for a course</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span> <span class="role admin">ADMIN</span></td>
+        <td><span class="own-badge">OWN ONLY</span> for STUDENT</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/students/{studentId}/progress</code></td>
+        <td>Get all progress for a student</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span> <span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td><span class="own-badge">OWN ONLY</span> for STUDENT</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/students/{studentId}/progress/{courseId}</code></td>
+        <td>Get progress for a specific course</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span> <span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td><span class="own-badge">OWN ONLY</span> for STUDENT</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- COURSE SERVICE -->
+  <h3>3.3 Course Service <span class="svc-tag svc-course">:8083</span></h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Method</th><th>Path</th><th>Description</th><th>Auth?</th><th>Roles Allowed</th><th>Ownership</th></tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/courses</code></td>
+        <td>Create a new course</td>
+        <td>Yes</td>
+        <td><span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/courses/{courseId}</code></td>
+        <td>Get course by ID</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/courses</code></td>
+        <td>Get all published courses</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/courses/all</code></td>
+        <td>Get all courses (including unpublished)</td>
+        <td>Yes</td>
+        <td><span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/courses/instructor/{instructorId}</code></td>
+        <td>Get courses by instructor</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/courses/category/{categoryId}</code></td>
+        <td>Get courses by category</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/courses/search</code></td>
+        <td>Search courses by keyword</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method put">PUT</span></td>
+        <td><code>/api/courses/{courseId}</code></td>
+        <td>Update a course</td>
+        <td>Yes</td>
+        <td><span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td><span class="own-badge">OWN COURSE</span> for INSTRUCTOR</td>
+      </tr>
+      <tr>
+        <td><span class="method put">PUT</span></td>
+        <td><code>/api/courses/{courseId}/publish</code></td>
+        <td>Publish a course</td>
+        <td>Yes</td>
+        <td><span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td><span class="own-badge">OWN COURSE</span> for INSTRUCTOR</td>
+      </tr>
+      <tr>
+        <td><span class="method delete">DELETE</span></td>
+        <td><code>/api/courses/{courseId}</code></td>
+        <td>Delete a course</td>
+        <td>Yes</td>
+        <td><span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td><span class="own-badge">OWN COURSE</span> for INSTRUCTOR</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/courses/{courseId}/exists</code></td>
+        <td>Check if course exists (inter-service)</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/courses/{courseId}/lessons</code></td>
+        <td>Add a lesson to a course</td>
+        <td>Yes</td>
+        <td><span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/courses/{courseId}/lessons</code></td>
+        <td>Get all lessons for a course</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method put">PUT</span></td>
+        <td><code>/api/courses/lessons/{lessonId}</code></td>
+        <td>Update a lesson</td>
+        <td>Yes</td>
+        <td><span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method delete">DELETE</span></td>
+        <td><code>/api/courses/lessons/{lessonId}</code></td>
+        <td>Delete a lesson</td>
+        <td>Yes</td>
+        <td><span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- CATEGORIES (COURSE SERVICE) -->
+  <h3>3.4 Course Categories <span class="svc-tag svc-course">:8083</span></h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Method</th><th>Path</th><th>Description</th><th>Auth?</th><th>Roles Allowed</th></tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/courses/categories</code></td>
+        <td>Create a new category</td>
+        <td>Yes</td>
+        <td><span class="role admin">ADMIN</span></td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/courses/categories</code></td>
+        <td>Get all categories</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/courses/categories/{categoryId}</code></td>
+        <td>Get category by ID</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+      </tr>
+      <tr>
+        <td><span class="method put">PUT</span></td>
+        <td><code>/api/courses/categories/{categoryId}</code></td>
+        <td>Update a category</td>
+        <td>Yes</td>
+        <td><span class="role admin">ADMIN</span></td>
+      </tr>
+      <tr>
+        <td><span class="method delete">DELETE</span></td>
+        <td><code>/api/courses/categories/{categoryId}</code></td>
+        <td>Delete a category</td>
+        <td>Yes</td>
+        <td><span class="role admin">ADMIN</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- INSTRUCTOR SERVICE -->
+  <h3>3.5 Instructor Service <span class="svc-tag svc-instructor">:8084</span></h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Method</th><th>Path</th><th>Description</th><th>Auth?</th><th>Roles Allowed</th><th>Ownership</th></tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/instructors</code></td>
+        <td>Create instructor profile</td>
+        <td>Yes</td>
+        <td><span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/instructors/{instructorId}</code></td>
+        <td>Get instructor by ID</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/instructors</code></td>
+        <td>Get all instructors</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method put">PUT</span></td>
+        <td><code>/api/instructors/{instructorId}</code></td>
+        <td>Update instructor profile</td>
+        <td>Yes</td>
+        <td><span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td><span class="own-badge">OWN ONLY</span> for INSTRUCTOR</td>
+      </tr>
+      <tr>
+        <td><span class="method delete">DELETE</span></td>
+        <td><code>/api/instructors/{instructorId}</code></td>
+        <td>Delete instructor</td>
+        <td>Yes</td>
+        <td><span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/instructors/{instructorId}/exists</code></td>
+        <td>Check if instructor exists (inter-service)</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/instructors/{instructorId}/reviews</code></td>
+        <td>Add a review for an instructor</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/instructors/{instructorId}/reviews</code></td>
+        <td>Get all reviews for an instructor</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ENROLLMENT SERVICE -->
+  <h3>3.6 Enrollment Service <span class="svc-tag svc-enrollment">:8085</span></h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Method</th><th>Path</th><th>Description</th><th>Auth?</th><th>Roles Allowed</th><th>Ownership</th></tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/enrollments/enroll</code></td>
+        <td>Enroll student in a course</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/enrollments/student/{studentId}</code></td>
+        <td>Get all enrollments for a student</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span> <span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td><span class="own-badge">OWN ONLY</span> for STUDENT</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/enrollments/course/{courseId}</code></td>
+        <td>Get enrollments for a course</td>
+        <td>Yes</td>
+        <td><span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method put">PUT</span></td>
+        <td><code>/api/enrollments/complete</code></td>
+        <td>Mark enrollment as completed (triggers certificate)</td>
+        <td>Yes*</td>
+        <td><span class="role admin">ADMIN</span> <span class="role instructor">INSTRUCTOR</span> <span class="role system">SYSTEM</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method put">PUT</span></td>
+        <td><code>/api/enrollments/drop</code></td>
+        <td>Drop a course enrollment</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span> <span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/enrollments/check</code></td>
+        <td>Check if student is enrolled in a course</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/enrollments/wishlist</code></td>
+        <td>Add course to wishlist</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/enrollments/wishlist</code></td>
+        <td>Get student's wishlist</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span> <span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method delete">DELETE</span></td>
+        <td><code>/api/enrollments/wishlist</code></td>
+        <td>Remove course from wishlist</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span> <span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- QUIZ SERVICE -->
+  <h3>3.7 Quiz Service <span class="svc-tag svc-quiz">:8086</span></h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Method</th><th>Path</th><th>Description</th><th>Auth?</th><th>Roles Allowed</th><th>Ownership</th></tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/quizzes</code></td>
+        <td>Create a new quiz</td>
+        <td>Yes</td>
+        <td><span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/quizzes/course/{courseId}</code></td>
+        <td>Get all active quizzes for a course</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/quizzes/{quizId}</code></td>
+        <td>Get quiz by ID</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/quizzes/{quizId}/questions</code></td>
+        <td>Add a question to a quiz</td>
+        <td>Yes</td>
+        <td><span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/quizzes/{quizId}/questions</code></td>
+        <td>Get all questions for a quiz</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/quizzes/submit</code></td>
+        <td>Submit quiz answers (auto-grades, triggers completion)</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/quizzes/attempts/student/{studentId}</code></td>
+        <td>Get all quiz attempts by a student</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span> <span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td><span class="own-badge">OWN ONLY</span> for STUDENT</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/quizzes/{quizId}/attempts/{studentId}</code></td>
+        <td>Get attempts for a specific quiz by student</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span> <span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td><span class="own-badge">OWN ONLY</span> for STUDENT</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- CERTIFICATE SERVICE -->
+  <h3>3.8 Certificate Service <span class="svc-tag svc-certificate">:8087</span></h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Method</th><th>Path</th><th>Description</th><th>Auth?</th><th>Roles Allowed</th><th>Ownership</th></tr>
+      <tr>
+        <td><span class="method post">POST</span></td>
+        <td><code>/api/certificates/issue</code></td>
+        <td>Issue a certificate (triggered by Enrollment or manual)</td>
+        <td>Yes*</td>
+        <td><span class="role admin">ADMIN</span> <span class="role instructor">INSTRUCTOR</span> <span class="role system">SYSTEM</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/certificates/student/{studentId}</code></td>
+        <td>Get all certificates for a student</td>
+        <td>Yes</td>
+        <td><span class="role student">STUDENT</span> <span class="role instructor">INSTRUCTOR</span> <span class="role admin">ADMIN</span></td>
+        <td><span class="own-badge">OWN ONLY</span> for STUDENT</td>
+      </tr>
+      <tr>
+        <td><span class="method get">GET</span></td>
+        <td><code>/api/certificates/verify/{certificateCode}</code></td>
+        <td>Verify certificate authenticity by code</td>
+        <td>Yes</td>
+        <td><span class="role any">ANY AUTHENTICATED</span></td>
+        <td>&mdash;</td>
+      </tr>
+      <tr>
+        <td><span class="method put">PUT</span></td>
+        <td><code>/api/certificates/{certificateId}/revoke</code></td>
+        <td>Revoke a certificate</td>
+        <td>Yes</td>
+        <td><span class="role admin">ADMIN</span></td>
+        <td>&mdash;</td>
+      </tr>
+    </table>
+  </div>
+
+  <p style="font-size:0.82rem; color:var(--gray-500); margin-top:16px;">
+    * <strong>Yes*</strong> = X-User-Role header is optional. When absent (inter-service call via RestTemplate), the endpoint allows access. When present, it must be ADMIN or INSTRUCTOR.
+  </p>
+</section>
+
+<!-- ============================================================ -->
+<!-- 4. RELATIONSHIP MAPPING -->
+<!-- ============================================================ -->
+<section id="relationships">
+  <h2><span class="icon">4.</span> Relationship Mapping</h2>
+  <p class="section-desc">Service-to-service communication, data flows, shared resources, and interaction patterns</p>
+
+  <h3>4.1 Service-to-Service Communication Map</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Caller</th><th>Callee</th><th>Endpoint Called</th><th>Purpose</th><th>Pattern</th></tr>
+      <tr>
+        <td><span class="svc-tag svc-gateway">API Gateway</span></td>
+        <td><span class="svc-tag svc-auth">Auth Service</span></td>
+        <td><code>POST /api/auth/introspect</code></td>
+        <td>Validate token, extract userId/role for every request</td>
+        <td>Synchronous (WebClient)</td>
+      </tr>
+      <tr>
+        <td><span class="svc-tag svc-enrollment">Enrollment</span></td>
+        <td><span class="svc-tag svc-student">Student Service</span></td>
+        <td><code>GET /api/students/{id}/exists</code></td>
+        <td>Verify student exists before enrollment</td>
+        <td>Synchronous (RestTemplate)</td>
+      </tr>
+      <tr>
+        <td><span class="svc-tag svc-enrollment">Enrollment</span></td>
+        <td><span class="svc-tag svc-course">Course Service</span></td>
+        <td><code>GET /api/courses/{id}/exists</code></td>
+        <td>Verify course exists before enrollment</td>
+        <td>Synchronous (RestTemplate)</td>
+      </tr>
+      <tr>
+        <td><span class="svc-tag svc-enrollment">Enrollment</span></td>
+        <td><span class="svc-tag svc-certificate">Certificate Service</span></td>
+        <td><code>POST /api/certificates/issue?studentId=X&courseId=Y</code></td>
+        <td>Trigger certificate issuance on course completion</td>
+        <td>Synchronous (RestTemplate)</td>
+      </tr>
+      <tr>
+        <td><span class="svc-tag svc-quiz">Quiz Service</span></td>
+        <td><span class="svc-tag svc-enrollment">Enrollment Service</span></td>
+        <td><code>PUT /api/enrollments/complete?studentId=X&courseId=Y</code></td>
+        <td>Mark enrollment completed when quiz is passed</td>
+        <td>Synchronous (RestTemplate)</td>
+      </tr>
+      <tr>
+        <td><span class="svc-tag svc-certificate">Certificate</span></td>
+        <td><span class="svc-tag svc-student">Student Service</span></td>
+        <td><code>GET /api/students/{id}</code></td>
+        <td>Fetch student name for certificate</td>
+        <td>Synchronous (RestTemplate)</td>
+      </tr>
+      <tr>
+        <td><span class="svc-tag svc-certificate">Certificate</span></td>
+        <td><span class="svc-tag svc-course">Course Service</span></td>
+        <td><code>GET /api/courses/{id}</code></td>
+        <td>Fetch course name for certificate</td>
+        <td>Synchronous (RestTemplate)</td>
+      </tr>
+    </table>
+  </div>
+
+  <h3>4.2 Key Data Flow: Course Completion Chain</h3>
+  <p>The most complex data flow in the system is the course completion pipeline. When a student passes a quiz, it triggers a chain of synchronous calls across four services:</p>
+  <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 10px; padding: 24px; margin: 16px 0; font-size: 0.9rem; font-family: monospace; line-height: 2;">
+    <strong>Student submits quiz</strong> &rarr; <span class="svc-tag svc-quiz">Quiz Service</span> auto-grades<br>
+    &emsp;&emsp;&darr; if passed<br>
+    <span class="svc-tag svc-quiz">Quiz Service</span> &rarr; <code>PUT /api/enrollments/complete</code> &rarr; <span class="svc-tag svc-enrollment">Enrollment Service</span><br>
+    &emsp;&emsp;&darr; marks COMPLETED<br>
+    <span class="svc-tag svc-enrollment">Enrollment Service</span> &rarr; <code>POST /api/certificates/issue</code> &rarr; <span class="svc-tag svc-certificate">Certificate Service</span><br>
+    &emsp;&emsp;&darr; needs student name + course name<br>
+    <span class="svc-tag svc-certificate">Certificate Service</span> &rarr; <code>GET /api/students/{id}</code> &rarr; <span class="svc-tag svc-student">Student Service</span><br>
+    <span class="svc-tag svc-certificate">Certificate Service</span> &rarr; <code>GET /api/courses/{id}</code> &rarr; <span class="svc-tag svc-course">Course Service</span><br>
+    &emsp;&emsp;&darr; certificate issued with code <code>CERT-2026-0001</code>
+  </div>
+
+  <h3>4.3 Shared Resources</h3>
+  <p>All 7 microservices share a single MySQL 8.0 instance (run via Docker) but each uses its own isolated schema. There is no direct database-level sharing between services; all cross-service data access happens through REST APIs. The <code>userId</code> field from Auth Service acts as the universal foreign key that links data across Student (studentId), Instructor (instructorId), and all downstream services.</p>
+
+  <h3>4.4 Interaction Patterns Summary</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Pattern</th><th>Usage</th><th>Details</th></tr>
+      <tr><td>API Gateway Proxy</td><td>All client requests</td><td>Spring Cloud Gateway routes by path prefix to backend services</td></tr>
+      <tr><td>Token Introspection</td><td>Every authenticated request</td><td>Gateway calls Auth Service to validate token, attaches X-User-Id/Role headers</td></tr>
+      <tr><td>Synchronous REST (RestTemplate)</td><td>Inter-service calls</td><td>6 directed calls between services (no async/event-driven)</td></tr>
+      <tr><td>Ownership Verification</td><td>RBAC enforcement</td><td>Controllers compare X-User-Id against resource owner to enforce access</td></tr>
+      <tr><td>Database-per-Service</td><td>Data isolation</td><td>7 MySQL schemas, no cross-schema joins</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 5. RBAC -->
+<!-- ============================================================ -->
+<section id="rbac">
+  <h2><span class="icon">5.</span> Role-Based Access Control (RBAC)</h2>
+  <p class="section-desc">Complete permissions matrix for each role in the system</p>
+
+  <h3>5.1 Role Definitions</h3>
+  <div class="card-grid" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="card" style="border-left: 4px solid #3b82f6;">
+      <h4><span class="role student">STUDENT</span></h4>
+      <p>Learners who enroll in courses, track progress, take quizzes, and earn certificates.</p>
+      <div class="detail"><strong>Can:</strong> Enroll in courses, view own profile/progress, submit quizzes, manage wishlist, review instructors, view own certificates</div>
+      <div class="detail" style="margin-top:8px;"><strong>Cannot:</strong> Create/edit/delete courses, manage categories, delete any user, revoke certificates, view other students' data, mark completions</div>
+    </div>
+    <div class="card" style="border-left: 4px solid #8b5cf6;">
+      <h4><span class="role instructor">INSTRUCTOR</span></h4>
+      <p>Course creators who build content, manage lessons, create quizzes, and view their students' performance.</p>
+      <div class="detail"><strong>Can:</strong> Create/edit/publish/delete own courses and lessons, create quizzes and questions, view course enrollments, view any student's progress/attempts</div>
+      <div class="detail" style="margin-top:8px;"><strong>Cannot:</strong> Enroll in courses, submit quizzes, manage wishlists, create categories, delete instructors, revoke certificates, review instructors</div>
+    </div>
+    <div class="card" style="border-left: 4px solid #dc2626;">
+      <h4><span class="role admin">ADMIN</span></h4>
+      <p>System administrators with full platform access for management and moderation.</p>
+      <div class="detail"><strong>Can:</strong> Everything instructors can do, plus: manage categories, deactivate students, delete instructors, revoke certificates, update any profile, mark completions, view all data</div>
+      <div class="detail" style="margin-top:8px;"><strong>Cannot:</strong> Only self-register (must be set via seed data or DB), cannot submit quizzes or review instructors as those are student-only actions</div>
+    </div>
+  </div>
+
+  <h3>5.2 Full Permissions Matrix</h3>
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Endpoint</th>
+        <th style="text-align:center;"><span class="role student">STUDENT</span></th>
+        <th style="text-align:center;"><span class="role instructor">INSTRUCTOR</span></th>
+        <th style="text-align:center;"><span class="role admin">ADMIN</span></th>
+        <th>Notes</th>
+      </tr>
+      <!-- AUTH -->
+      <tr style="background:#fef2f2;"><td colspan="5" style="font-weight:600;">Auth Service</td></tr>
+      <tr><td><code>POST /api/auth/register</code></td><td style="text-align:center;">PUBLIC</td><td style="text-align:center;">PUBLIC</td><td style="text-align:center;">PUBLIC</td><td>No auth needed</td></tr>
+      <tr><td><code>POST /api/auth/login</code></td><td style="text-align:center;">PUBLIC</td><td style="text-align:center;">PUBLIC</td><td style="text-align:center;">PUBLIC</td><td>No auth needed</td></tr>
+      <tr><td><code>POST /api/auth/logout</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>Any authenticated</td></tr>
+      <tr><td><code>POST /api/auth/introspect</code></td><td style="text-align:center;">&mdash;</td><td style="text-align:center;">&mdash;</td><td style="text-align:center;">&mdash;</td><td>Gateway only</td></tr>
+      <tr><td><code>GET /api/auth/profile</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>Any authenticated</td></tr>
+      <!-- STUDENT -->
+      <tr style="background:#eff6ff;"><td colspan="5" style="font-weight:600;">Student Service</td></tr>
+      <tr><td><code>POST /api/students</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>GET /api/students/{id}</code></td><td style="text-align:center;">Own</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>Student=own only</td></tr>
+      <tr><td><code>GET /api/students</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>PUT /api/students/{id}</code></td><td style="text-align:center;">Own</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td>Student=own only</td></tr>
+      <tr><td><code>DELETE /api/students/{id}</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td>Admin only</td></tr>
+      <tr><td><code>GET /api/students/{id}/exists</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>Inter-service</td></tr>
+      <tr><td><code>POST /api/students/{id}/progress</code></td><td style="text-align:center;">Own</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td>Student=own only</td></tr>
+      <tr><td><code>GET /api/students/{id}/progress</code></td><td style="text-align:center;">Own</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>Student=own only</td></tr>
+      <tr><td><code>GET /api/students/{id}/progress/{cid}</code></td><td style="text-align:center;">Own</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>Student=own only</td></tr>
+      <!-- COURSE -->
+      <tr style="background:#ecfdf5;"><td colspan="5" style="font-weight:600;">Course Service</td></tr>
+      <tr><td><code>POST /api/courses</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>GET /api/courses/{id}</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>GET /api/courses</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>Published only</td></tr>
+      <tr><td><code>GET /api/courses/all</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>Including unpublished</td></tr>
+      <tr><td><code>GET /api/courses/instructor/{id}</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>GET /api/courses/category/{id}</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>GET /api/courses/search</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>PUT /api/courses/{id}</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">Own</td><td style="text-align:center;">&#10003;</td><td>Instructor=own course</td></tr>
+      <tr><td><code>PUT /api/courses/{id}/publish</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">Own</td><td style="text-align:center;">&#10003;</td><td>Instructor=own course</td></tr>
+      <tr><td><code>DELETE /api/courses/{id}</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">Own</td><td style="text-align:center;">&#10003;</td><td>Instructor=own course</td></tr>
+      <tr><td><code>GET /api/courses/{id}/exists</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>Inter-service</td></tr>
+      <tr><td><code>POST /api/courses/{id}/lessons</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>GET /api/courses/{id}/lessons</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>PUT /api/courses/lessons/{id}</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>DELETE /api/courses/lessons/{id}</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <!-- CATEGORIES -->
+      <tr style="background:#ecfdf5;"><td colspan="5" style="font-weight:600;">Course Categories</td></tr>
+      <tr><td><code>POST /api/courses/categories</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td>Admin only</td></tr>
+      <tr><td><code>GET /api/courses/categories</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>GET /api/courses/categories/{id}</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>PUT /api/courses/categories/{id}</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td>Admin only</td></tr>
+      <tr><td><code>DELETE /api/courses/categories/{id}</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td>Admin only</td></tr>
+      <!-- INSTRUCTOR -->
+      <tr style="background:#f5f3ff;"><td colspan="5" style="font-weight:600;">Instructor Service</td></tr>
+      <tr><td><code>POST /api/instructors</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>GET /api/instructors/{id}</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>GET /api/instructors</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>PUT /api/instructors/{id}</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">Own</td><td style="text-align:center;">&#10003;</td><td>Instructor=own only</td></tr>
+      <tr><td><code>DELETE /api/instructors/{id}</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td>Admin only</td></tr>
+      <tr><td><code>GET /api/instructors/{id}/exists</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>Inter-service</td></tr>
+      <tr><td><code>POST /api/instructors/{id}/reviews</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10007;</td><td>Student only</td></tr>
+      <tr><td><code>GET /api/instructors/{id}/reviews</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <!-- ENROLLMENT -->
+      <tr style="background:#fffbeb;"><td colspan="5" style="font-weight:600;">Enrollment Service</td></tr>
+      <tr><td><code>POST /api/enrollments/enroll</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10007;</td><td>Student only</td></tr>
+      <tr><td><code>GET /api/enrollments/student/{id}</code></td><td style="text-align:center;">Own</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>Student=own only</td></tr>
+      <tr><td><code>GET /api/enrollments/course/{id}</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>PUT /api/enrollments/complete</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>+ System calls</td></tr>
+      <tr><td><code>PUT /api/enrollments/drop</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>GET /api/enrollments/check</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>POST /api/enrollments/wishlist</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10007;</td><td>Student only</td></tr>
+      <tr><td><code>GET /api/enrollments/wishlist</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>DELETE /api/enrollments/wishlist</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <!-- QUIZ -->
+      <tr style="background:#fce7f3;"><td colspan="5" style="font-weight:600;">Quiz Service</td></tr>
+      <tr><td><code>POST /api/quizzes</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>GET /api/quizzes/course/{id}</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>GET /api/quizzes/{id}</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>POST /api/quizzes/{id}/questions</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>GET /api/quizzes/{id}/questions</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>POST /api/quizzes/submit</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10007;</td><td>Student only</td></tr>
+      <tr><td><code>GET /api/quizzes/attempts/student/{id}</code></td><td style="text-align:center;">Own</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>Student=own only</td></tr>
+      <tr><td><code>GET /api/quizzes/{id}/attempts/{sid}</code></td><td style="text-align:center;">Own</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>Student=own only</td></tr>
+      <!-- CERTIFICATE -->
+      <tr style="background:#cffafe;"><td colspan="5" style="font-weight:600;">Certificate Service</td></tr>
+      <tr><td><code>POST /api/certificates/issue</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>+ System calls</td></tr>
+      <tr><td><code>GET /api/certificates/student/{id}</code></td><td style="text-align:center;">Own</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td>Student=own only</td></tr>
+      <tr><td><code>GET /api/certificates/verify/{code}</code></td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td style="text-align:center;">&#10003;</td><td></td></tr>
+      <tr><td><code>PUT /api/certificates/{id}/revoke</code></td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10007;</td><td style="text-align:center;">&#10003;</td><td>Admin only</td></tr>
+    </table>
+  </div>
+
+  <h3>5.3 RBAC Implementation Pattern</h3>
+  <p>Access control is enforced at the controller level using two helper methods present in every controller:</p>
+  <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 10px; padding: 20px; margin: 16px 0; font-family: monospace; font-size: 0.85rem; white-space: pre; overflow-x: auto;">requireRole(userRole, "STUDENT", "ADMIN")
+  &rarr; Checks X-User-Role header against allowed roles
+  &rarr; Throws 403 FORBIDDEN if role not in allowed list
+
+requireOwnershipOrAdmin(userId, resourceOwnerId, role)
+  &rarr; If ADMIN, always passes
+  &rarr; Otherwise, compares X-User-Id with the resource owner's ID
+  &rarr; Throws 403 FORBIDDEN if user does not own the resource</div>
+  <p>The API Gateway's <code>AuthenticationFilter</code> attaches <code>X-User-Id</code>, <code>X-Username</code>, and <code>X-User-Role</code> headers to every authenticated request after validating the token via the Auth Service's introspect endpoint. These headers are the foundation of the entire RBAC system.</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- 6. ARCHITECTURE DIAGRAMS -->
+<!-- ============================================================ -->
+<section id="arch-diagram">
+  <h2><span class="icon">6.</span> System Architecture Diagram</h2>
+  <p class="section-desc">Full visual architecture showing all services, connections, and external systems</p>
+
+  <div class="diagram-container">
+    <div class="diagram-title">Full System Architecture</div>
+    <div class="diagram-body">
+      <svg viewBox="0 0 1100 960" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1100px;">
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#6b7280"/>
+          </marker>
+          <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#f59e0b"/>
+          </marker>
+          <marker id="arrowCyan" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#06b6d4"/>
+          </marker>
+          <marker id="arrowPink" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#ec4899"/>
+          </marker>
+          <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#ef4444"/>
+          </marker>
+          <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+          </filter>
+        </defs>
+
+        <!-- ===================== CLIENT LAYER ===================== -->
+        <rect x="30" y="15" width="720" height="70" rx="12" fill="#f0f9ff" stroke="#bfdbfe" stroke-width="1.5"/>
+        <text x="50" y="38" font-size="11" fill="#6b7280" font-weight="600">CLIENT LAYER</text>
+        <rect x="60" y="45" width="160" height="30" rx="6" fill="#1e40af" filter="url(#shadow)"/>
+        <text x="140" y="65" text-anchor="middle" fill="white" font-size="11" font-weight="600">React Frontend</text>
+        <rect x="240" y="45" width="160" height="30" rx="6" fill="#1e40af" filter="url(#shadow)"/>
+        <text x="320" y="65" text-anchor="middle" fill="white" font-size="11" font-weight="600">Swagger UI</text>
+        <rect x="420" y="45" width="160" height="30" rx="6" fill="#1e40af" filter="url(#shadow)"/>
+        <text x="500" y="65" text-anchor="middle" fill="white" font-size="11" font-weight="600">Mobile / 3rd Party</text>
+
+        <!-- Arrow: client -> gateway -->
+        <line x1="390" y1="85" x2="390" y2="115" stroke="#6b7280" stroke-width="2" marker-end="url(#arrowhead)"/>
+        <text x="400" y="105" font-size="9" fill="#6b7280">HTTPS</text>
+
+        <!-- ===================== API GATEWAY ===================== -->
+        <rect x="130" y="120" width="520" height="80" rx="12" fill="#1e3a5f" filter="url(#shadow)"/>
+        <text x="390" y="148" text-anchor="middle" fill="white" font-size="15" font-weight="700">API Gateway</text>
+        <text x="390" y="167" text-anchor="middle" fill="#93c5fd" font-size="11">Spring Cloud Gateway (Reactive / Netty) | :8080</text>
+        <text x="390" y="184" text-anchor="middle" fill="#7dd3fc" font-size="9">AuthenticationFilter | CORS | Path-Based Routing | Swagger Aggregation</text>
+
+        <!-- ===================== AUTH SERVICE (right of gateway) ===================== -->
+        <rect x="700" y="120" width="220" height="80" rx="10" fill="white" stroke="#ef4444" stroke-width="2" filter="url(#shadow)"/>
+        <rect x="700" y="120" width="220" height="24" rx="10" fill="#ef4444"/>
+        <rect x="700" y="132" width="220" height="12" fill="#ef4444"/>
+        <text x="810" y="138" text-anchor="middle" fill="white" font-size="12" font-weight="700">Auth Service</text>
+        <text x="810" y="162" text-anchor="middle" fill="#6b7280" font-size="10">OAuth 2.0 Opaque Tokens | :8081</text>
+        <text x="810" y="180" text-anchor="middle" fill="#9ca3af" font-size="9">auth_db (users, access_tokens)</text>
+
+        <!-- Arrow: gateway -> auth (introspect) -->
+        <line x1="650" y1="160" x2="695" y2="160" stroke="#ef4444" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrowRed)"/>
+        <text x="660" y="152" font-size="9" fill="#ef4444" font-weight="600">introspect</text>
+
+        <!-- ===================== DOMAIN SERVICES LABEL ===================== -->
+        <text x="50" y="240" font-size="12" fill="#6b7280" font-weight="700" letter-spacing="1">DOMAIN SERVICES</text>
+        <line x1="50" y1="246" x2="1050" y2="246" stroke="#e5e7eb" stroke-width="1"/>
+
+        <!-- ===================== ROW 1: Student, Course, Instructor ===================== -->
+        <!-- Gateway -> Row 1 routing lines -->
+        <line x1="260" y1="200" x2="155" y2="260" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <line x1="390" y1="200" x2="455" y2="260" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <line x1="520" y1="200" x2="755" y2="260" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+        <!-- Student Service -->
+        <rect x="30" y="265" width="250" height="80" rx="10" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+        <rect x="30" y="265" width="250" height="24" rx="10" fill="#3b82f6"/>
+        <rect x="30" y="277" width="250" height="12" fill="#3b82f6"/>
+        <text x="155" y="283" text-anchor="middle" fill="white" font-size="12" font-weight="700">Student Service</text>
+        <text x="155" y="308" text-anchor="middle" fill="#374151" font-size="10">Profiles &amp; Progress Tracking</text>
+        <text x="155" y="325" text-anchor="middle" fill="#6b7280" font-size="10">:8082 | student_db</text>
+
+        <!-- Course Service -->
+        <rect x="330" y="265" width="250" height="80" rx="10" fill="white" stroke="#10b981" stroke-width="2" filter="url(#shadow)"/>
+        <rect x="330" y="265" width="250" height="24" rx="10" fill="#10b981"/>
+        <rect x="330" y="277" width="250" height="12" fill="#10b981"/>
+        <text x="455" y="283" text-anchor="middle" fill="white" font-size="12" font-weight="700">Course Service</text>
+        <text x="455" y="308" text-anchor="middle" fill="#374151" font-size="10">Courses, Lessons &amp; Categories</text>
+        <text x="455" y="325" text-anchor="middle" fill="#6b7280" font-size="10">:8083 | course_db</text>
+
+        <!-- Instructor Service -->
+        <rect x="630" y="265" width="250" height="80" rx="10" fill="white" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
+        <rect x="630" y="265" width="250" height="24" rx="10" fill="#8b5cf6"/>
+        <rect x="630" y="277" width="250" height="12" fill="#8b5cf6"/>
+        <text x="755" y="283" text-anchor="middle" fill="white" font-size="12" font-weight="700">Instructor Service</text>
+        <text x="755" y="308" text-anchor="middle" fill="#374151" font-size="10">Profiles &amp; Reviews</text>
+        <text x="755" y="325" text-anchor="middle" fill="#6b7280" font-size="10">:8084 | instructor_db</text>
+
+        <!-- ===================== ROW 2: Enrollment, Quiz, Certificate ===================== -->
+        <!-- Gateway -> Row 2 routing lines (thin, behind) -->
+        <line x1="220" y1="200" x2="155" y2="430" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="350" y1="200" x2="455" y2="430" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="480" y1="200" x2="755" y2="430" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,4"/>
+
+        <!-- Enrollment Service -->
+        <rect x="30" y="435" width="250" height="80" rx="10" fill="white" stroke="#f59e0b" stroke-width="2" filter="url(#shadow)"/>
+        <rect x="30" y="435" width="250" height="24" rx="10" fill="#f59e0b"/>
+        <rect x="30" y="447" width="250" height="12" fill="#f59e0b"/>
+        <text x="155" y="453" text-anchor="middle" fill="white" font-size="12" font-weight="700">Enrollment Service</text>
+        <text x="155" y="478" text-anchor="middle" fill="#374151" font-size="10">Enrollments &amp; Wishlists</text>
+        <text x="155" y="495" text-anchor="middle" fill="#6b7280" font-size="10">:8085 | enrollment_db</text>
+
+        <!-- Quiz Service -->
+        <rect x="330" y="435" width="250" height="80" rx="10" fill="white" stroke="#ec4899" stroke-width="2" filter="url(#shadow)"/>
+        <rect x="330" y="435" width="250" height="24" rx="10" fill="#ec4899"/>
+        <rect x="330" y="447" width="250" height="12" fill="#ec4899"/>
+        <text x="455" y="453" text-anchor="middle" fill="white" font-size="12" font-weight="700">Quiz Service</text>
+        <text x="455" y="478" text-anchor="middle" fill="#374151" font-size="10">Quizzes &amp; Auto-Grading</text>
+        <text x="455" y="495" text-anchor="middle" fill="#6b7280" font-size="10">:8086 | quiz_db</text>
+
+        <!-- Certificate Service -->
+        <rect x="630" y="435" width="250" height="80" rx="10" fill="white" stroke="#06b6d4" stroke-width="2" filter="url(#shadow)"/>
+        <rect x="630" y="435" width="250" height="24" rx="10" fill="#06b6d4"/>
+        <rect x="630" y="447" width="250" height="12" fill="#06b6d4"/>
+        <text x="755" y="453" text-anchor="middle" fill="white" font-size="12" font-weight="700">Certificate Service</text>
+        <text x="755" y="478" text-anchor="middle" fill="#374151" font-size="10">Issuance &amp; Verification</text>
+        <text x="755" y="495" text-anchor="middle" fill="#6b7280" font-size="10">:8087 | certificate_db</text>
+
+        <!-- ===================== INTER-SERVICE ARROWS ===================== -->
+        <!-- Space between rows: Row1 bottom=345, Row2 top=435, gap=90px -->
+
+        <!-- Enrollment -> Student (verify exists) -->
+        <path d="M 100 435 L 100 350" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,3" fill="none" marker-end="url(#arrowOrange)"/>
+        <text x="35" y="395" font-size="9" fill="#d97706" font-weight="600">verify student</text>
+
+        <!-- Enrollment -> Course (verify exists) -->
+        <path d="M 210 435 L 400 350" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,3" fill="none" marker-end="url(#arrowOrange)"/>
+        <text x="270" y="382" font-size="9" fill="#d97706" font-weight="600">verify course</text>
+
+        <!-- Enrollment -> Certificate (issue cert) -->
+        <path d="M 280 475 L 625 475" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,3" fill="none" marker-end="url(#arrowOrange)"/>
+        <text x="420" y="468" font-size="9" fill="#d97706" font-weight="600">issue certificate</text>
+
+        <!-- Quiz -> Enrollment (mark complete) -->
+        <path d="M 330 470 L 285 470" stroke="#ec4899" stroke-width="2" stroke-dasharray="6,3" fill="none" marker-end="url(#arrowPink)"/>
+        <text x="288" y="462" font-size="9" fill="#ec4899" font-weight="600">mark complete</text>
+
+        <!-- Certificate -> Student (fetch name) -->
+        <path d="M 680 435 C 500 380, 300 380, 210 350" stroke="#06b6d4" stroke-width="2" stroke-dasharray="6,3" fill="none" marker-end="url(#arrowCyan)"/>
+        <text x="430" y="400" font-size="9" fill="#0891b2" font-weight="600">fetch student name</text>
+
+        <!-- Certificate -> Course (fetch name) -->
+        <path d="M 720 435 C 620 390, 560 370, 510 350" stroke="#06b6d4" stroke-width="2" stroke-dasharray="6,3" fill="none" marker-end="url(#arrowCyan)"/>
+        <text x="620" y="390" font-size="9" fill="#0891b2" font-weight="600">fetch course name</text>
+
+        <!-- ===================== DATABASE LAYER ===================== -->
+        <rect x="30" y="565" width="950" height="90" rx="12" fill="#fef3c7" stroke="#fde68a" stroke-width="1.5"/>
+        <text x="55" y="588" font-size="12" fill="#92400e" font-weight="700">DATABASE LAYER</text>
+        <text x="200" y="588" font-size="10" fill="#b45309">MySQL 8.0 (Docker) &mdash; Database-per-Service Pattern</text>
+
+        <rect x="50" y="600" width="110" height="40" rx="6" fill="white" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="105" y="624" text-anchor="middle" fill="#991b1b" font-size="9" font-weight="600">auth_db</text>
+
+        <rect x="175" y="600" width="110" height="40" rx="6" fill="white" stroke="#3b82f6" stroke-width="1.5"/>
+        <text x="230" y="624" text-anchor="middle" fill="#1e40af" font-size="9" font-weight="600">student_db</text>
+
+        <rect x="300" y="600" width="110" height="40" rx="6" fill="white" stroke="#10b981" stroke-width="1.5"/>
+        <text x="355" y="624" text-anchor="middle" fill="#166534" font-size="9" font-weight="600">course_db</text>
+
+        <rect x="425" y="600" width="110" height="40" rx="6" fill="white" stroke="#8b5cf6" stroke-width="1.5"/>
+        <text x="480" y="624" text-anchor="middle" fill="#6d28d9" font-size="9" font-weight="600">instructor_db</text>
+
+        <rect x="550" y="600" width="110" height="40" rx="6" fill="white" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="605" y="624" text-anchor="middle" fill="#92400e" font-size="9" font-weight="600">enrollment_db</text>
+
+        <rect x="675" y="600" width="110" height="40" rx="6" fill="white" stroke="#ec4899" stroke-width="1.5"/>
+        <text x="730" y="624" text-anchor="middle" fill="#9d174d" font-size="9" font-weight="600">quiz_db</text>
+
+        <rect x="800" y="600" width="110" height="40" rx="6" fill="white" stroke="#06b6d4" stroke-width="1.5"/>
+        <text x="855" y="624" text-anchor="middle" fill="#0e7490" font-size="9" font-weight="600">certificate_db</text>
+
+        <!-- ===================== LEGEND (below DB, full width) ===================== -->
+        <rect x="30" y="685" width="500" height="260" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+        <text x="55" y="712" font-size="13" font-weight="700" fill="#1e293b">Legend</text>
+
+        <line x1="55" y1="735" x2="105" y2="735" stroke="#6b7280" stroke-width="2" marker-end="url(#arrowhead)"/>
+        <text x="115" y="739" font-size="11" fill="#475569">Gateway routing (client &rarr; service)</text>
+
+        <line x1="55" y1="762" x2="105" y2="762" stroke="#ef4444" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrowRed)"/>
+        <text x="115" y="766" font-size="11" fill="#475569">Token introspection (Gateway &rarr; Auth)</text>
+
+        <line x1="55" y1="789" x2="105" y2="789" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrowOrange)"/>
+        <text x="115" y="793" font-size="11" fill="#475569">Enrollment Service inter-service calls</text>
+
+        <line x1="55" y1="816" x2="105" y2="816" stroke="#06b6d4" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrowCyan)"/>
+        <text x="115" y="820" font-size="11" fill="#475569">Certificate Service inter-service calls</text>
+
+        <line x1="55" y1="843" x2="105" y2="843" stroke="#ec4899" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrowPink)"/>
+        <text x="115" y="847" font-size="11" fill="#475569">Quiz Service inter-service calls</text>
+
+        <line x1="55" y1="870" x2="105" y2="870" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="115" y="874" font-size="11" fill="#475569">Gateway &rarr; Row 2 routing (background)</text>
+
+        <rect x="55" y="892" width="18" height="14" rx="3" fill="white" stroke="#6b7280" stroke-width="1.5"/>
+        <text x="83" y="904" font-size="11" fill="#475569">Service box (color = domain)</text>
+
+        <rect x="55" y="918" width="18" height="14" rx="3" fill="white" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="83" y="930" font-size="11" fill="#475569">Database schema</text>
+
+        <!-- ===================== AUTH FLOW (bottom right) ===================== -->
+        <rect x="555" y="685" width="425" height="260" rx="12" fill="#fef2f2" stroke="#fecaca" stroke-width="1.5"/>
+        <text x="580" y="712" font-size="13" font-weight="700" fill="#991b1b">Authentication Flow</text>
+
+        <text x="580" y="740" font-size="11" fill="#475569"><tspan font-weight="700" fill="#991b1b">1.</tspan> Client sends Bearer token to Gateway (:8080)</text>
+        <text x="580" y="766" font-size="11" fill="#475569"><tspan font-weight="700" fill="#991b1b">2.</tspan> AuthenticationFilter calls POST /api/auth/introspect</text>
+        <text x="580" y="792" font-size="11" fill="#475569"><tspan font-weight="700" fill="#991b1b">3.</tspan> Auth Service validates token, returns userId + role</text>
+        <text x="580" y="818" font-size="11" fill="#475569"><tspan font-weight="700" fill="#991b1b">4.</tspan> Gateway attaches X-User-Id, X-User-Role headers</text>
+        <text x="580" y="844" font-size="11" fill="#475569"><tspan font-weight="700" fill="#991b1b">5.</tspan> Request proxied to target microservice</text>
+        <text x="580" y="870" font-size="11" fill="#475569"><tspan font-weight="700" fill="#991b1b">6.</tspan> Service enforces RBAC via requireRole()</text>
+
+        <rect x="580" y="895" width="375" height="35" rx="6" fill="#fef9c3" stroke="#fde68a" stroke-width="1"/>
+        <text x="590" y="916" font-size="10" fill="#92400e" font-weight="600">All inter-service calls use synchronous REST (RestTemplate)</text>
+
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 7. ER DIAGRAMS -->
+<!-- ============================================================ -->
+<section id="er-diagrams">
+  <h2><span class="icon">7.</span> Entity-Relationship Diagrams</h2>
+  <p class="section-desc">Full ER diagram across all databases and individual per-service diagrams</p>
+
+  <div class="diagram-container">
+    <div class="diagram-title">7.1 Full System ER Diagram (All Databases)</div>
+    <div class="diagram-body">
+      <svg viewBox="0 0 1300 700" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1300px;">
+        <defs>
+          <marker id="erArrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#94a3b8"/>
+          </marker>
+        </defs>
+
+        <!-- AUTH DB -->
+        <rect x="20" y="20" width="240" height="190" rx="8" fill="white" stroke="#ef4444" stroke-width="2"/>
+        <rect x="20" y="20" width="240" height="28" rx="8" fill="#ef4444"/>
+        <rect x="20" y="36" width="240" height="12" fill="#ef4444"/>
+        <text x="140" y="40" text-anchor="middle" fill="white" font-size="12" font-weight="700">users (auth_db)</text>
+        <text x="32" y="68" font-size="10" fill="#1e40af" font-weight="600">PK user_id BIGINT</text>
+        <text x="32" y="84" font-size="10" fill="#374151">username VARCHAR(50)</text>
+        <text x="32" y="100" font-size="10" fill="#374151">email VARCHAR(100)</text>
+        <text x="32" y="116" font-size="10" fill="#374151">password_hash VARCHAR</text>
+        <text x="32" y="132" font-size="10" fill="#374151">role ENUM(STUDENT,INSTRUCTOR,ADMIN)</text>
+        <text x="32" y="148" font-size="10" fill="#374151">is_active BOOLEAN</text>
+        <text x="32" y="164" font-size="10" fill="#374151">created_at DATETIME</text>
+        <text x="32" y="180" font-size="10" fill="#374151">updated_at DATETIME</text>
+
+        <rect x="20" y="225" width="240" height="160" rx="8" fill="white" stroke="#ef4444" stroke-width="2"/>
+        <rect x="20" y="225" width="240" height="28" rx="8" fill="#ef4444"/>
+        <rect x="20" y="241" width="240" height="12" fill="#ef4444"/>
+        <text x="140" y="245" text-anchor="middle" fill="white" font-size="12" font-weight="700">access_tokens (auth_db)</text>
+        <text x="32" y="273" font-size="10" fill="#1e40af" font-weight="600">PK token_id BIGINT</text>
+        <text x="32" y="289" font-size="10" fill="#374151">token_value VARCHAR(500)</text>
+        <text x="32" y="305" font-size="10" fill="#7c3aed" font-style="italic">FK user_id BIGINT</text>
+        <text x="32" y="321" font-size="10" fill="#374151">user_role ENUM</text>
+        <text x="32" y="337" font-size="10" fill="#374151">issued_at / expires_at DATETIME</text>
+        <text x="32" y="353" font-size="10" fill="#374151">is_revoked BOOLEAN</text>
+
+        <!-- Arrow users -> access_tokens -->
+        <line x1="140" y1="210" x2="140" y2="225" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#erArrow)"/>
+        <text x="148" y="220" font-size="8" fill="#94a3b8">1:N</text>
+
+        <!-- STUDENT DB -->
+        <rect x="290" y="20" width="220" height="180" rx="8" fill="white" stroke="#3b82f6" stroke-width="2"/>
+        <rect x="290" y="20" width="220" height="28" rx="8" fill="#3b82f6"/>
+        <rect x="290" y="36" width="220" height="12" fill="#3b82f6"/>
+        <text x="400" y="40" text-anchor="middle" fill="white" font-size="12" font-weight="700">students (student_db)</text>
+        <text x="302" y="68" font-size="10" fill="#1e40af" font-weight="600">PK student_id BIGINT (=user_id)</text>
+        <text x="302" y="84" font-size="10" fill="#374151">first_name, last_name</text>
+        <text x="302" y="100" font-size="10" fill="#374151">email VARCHAR(100)</text>
+        <text x="302" y="116" font-size="10" fill="#374151">date_of_birth, phone_number</text>
+        <text x="302" y="132" font-size="10" fill="#374151">profile_picture, bio TEXT</text>
+        <text x="302" y="148" font-size="10" fill="#374151">registered_at DATETIME</text>
+        <text x="302" y="164" font-size="10" fill="#374151">is_active BOOLEAN</text>
+
+        <rect x="290" y="215" width="220" height="160" rx="8" fill="white" stroke="#3b82f6" stroke-width="2"/>
+        <rect x="290" y="215" width="220" height="28" rx="8" fill="#3b82f6"/>
+        <rect x="290" y="231" width="220" height="12" fill="#3b82f6"/>
+        <text x="400" y="235" text-anchor="middle" fill="white" font-size="12" font-weight="700">student_progress</text>
+        <text x="302" y="263" font-size="10" fill="#1e40af" font-weight="600">PK progress_id BIGINT</text>
+        <text x="302" y="279" font-size="10" fill="#7c3aed" font-style="italic">FK student_id BIGINT</text>
+        <text x="302" y="295" font-size="10" fill="#7c3aed" font-style="italic">REF course_id BIGINT</text>
+        <text x="302" y="311" font-size="10" fill="#374151">completed_lessons INT</text>
+        <text x="302" y="327" font-size="10" fill="#374151">total_lessons, progress_percent</text>
+        <text x="302" y="343" font-size="10" fill="#374151">is_completed BOOLEAN</text>
+
+        <line x1="400" y1="200" x2="400" y2="215" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#erArrow)"/>
+        <text x="408" y="210" font-size="8" fill="#94a3b8">1:N</text>
+
+        <!-- Cross-service ref: users -> students -->
+        <path d="M 260 100 L 290 100" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#erArrow)"/>
+        <text x="268" y="96" font-size="7" fill="#94a3b8">1:1</text>
+
+        <!-- COURSE DB -->
+        <rect x="540" y="20" width="220" height="180" rx="8" fill="white" stroke="#10b981" stroke-width="2"/>
+        <rect x="540" y="20" width="220" height="28" rx="8" fill="#10b981"/>
+        <rect x="540" y="36" width="220" height="12" fill="#10b981"/>
+        <text x="650" y="40" text-anchor="middle" fill="white" font-size="12" font-weight="700">courses (course_db)</text>
+        <text x="552" y="68" font-size="10" fill="#1e40af" font-weight="600">PK course_id BIGINT</text>
+        <text x="552" y="84" font-size="10" fill="#374151">title VARCHAR(200)</text>
+        <text x="552" y="100" font-size="10" fill="#374151">description TEXT</text>
+        <text x="552" y="116" font-size="10" fill="#7c3aed" font-style="italic">REF instructor_id BIGINT</text>
+        <text x="552" y="132" font-size="10" fill="#7c3aed" font-style="italic">FK category_id BIGINT</text>
+        <text x="552" y="148" font-size="10" fill="#374151">price, level, language</text>
+        <text x="552" y="164" font-size="10" fill="#374151">is_published, total_lessons</text>
+
+        <rect x="540" y="215" width="220" height="130" rx="8" fill="white" stroke="#10b981" stroke-width="2"/>
+        <rect x="540" y="215" width="220" height="28" rx="8" fill="#10b981"/>
+        <rect x="540" y="231" width="220" height="12" fill="#10b981"/>
+        <text x="650" y="235" text-anchor="middle" fill="white" font-size="12" font-weight="700">lessons (course_db)</text>
+        <text x="552" y="263" font-size="10" fill="#1e40af" font-weight="600">PK lesson_id BIGINT</text>
+        <text x="552" y="279" font-size="10" fill="#7c3aed" font-style="italic">FK course_id BIGINT</text>
+        <text x="552" y="295" font-size="10" fill="#374151">title, content TEXT</text>
+        <text x="552" y="311" font-size="10" fill="#374151">video_url, duration, order_index</text>
+        <text x="552" y="327" font-size="10" fill="#374151">is_preview BOOLEAN</text>
+
+        <line x1="650" y1="200" x2="650" y2="215" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#erArrow)"/>
+        <text x="658" y="210" font-size="8" fill="#94a3b8">1:N</text>
+
+        <rect x="540" y="360" width="220" height="100" rx="8" fill="white" stroke="#10b981" stroke-width="2"/>
+        <rect x="540" y="360" width="220" height="28" rx="8" fill="#10b981"/>
+        <rect x="540" y="376" width="220" height="12" fill="#10b981"/>
+        <text x="650" y="380" text-anchor="middle" fill="white" font-size="12" font-weight="700">course_categories</text>
+        <text x="552" y="408" font-size="10" fill="#1e40af" font-weight="600">PK category_id BIGINT</text>
+        <text x="552" y="424" font-size="10" fill="#374151">name VARCHAR(100)</text>
+        <text x="552" y="440" font-size="10" fill="#374151">description TEXT, icon_url</text>
+
+        <line x1="620" y1="200" x2="600" y2="360" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#erArrow)"/>
+        <text x="598" y="280" font-size="8" fill="#94a3b8">N:1</text>
+
+        <!-- INSTRUCTOR DB -->
+        <rect x="790" y="20" width="220" height="180" rx="8" fill="white" stroke="#8b5cf6" stroke-width="2"/>
+        <rect x="790" y="20" width="220" height="28" rx="8" fill="#8b5cf6"/>
+        <rect x="790" y="36" width="220" height="12" fill="#8b5cf6"/>
+        <text x="900" y="40" text-anchor="middle" fill="white" font-size="12" font-weight="700">instructors (instructor_db)</text>
+        <text x="802" y="68" font-size="10" fill="#1e40af" font-weight="600">PK instructor_id BIGINT (=user_id)</text>
+        <text x="802" y="84" font-size="10" fill="#374151">first_name, last_name, email</text>
+        <text x="802" y="100" font-size="10" fill="#374151">bio TEXT, expertise</text>
+        <text x="802" y="116" font-size="10" fill="#374151">linkedin_profile, website_url</text>
+        <text x="802" y="132" font-size="10" fill="#374151">total_courses, total_students</text>
+        <text x="802" y="148" font-size="10" fill="#374151">rating DOUBLE, is_verified</text>
+        <text x="802" y="164" font-size="10" fill="#374151">joined_at DATETIME</text>
+
+        <rect x="790" y="215" width="220" height="120" rx="8" fill="white" stroke="#8b5cf6" stroke-width="2"/>
+        <rect x="790" y="215" width="220" height="28" rx="8" fill="#8b5cf6"/>
+        <rect x="790" y="231" width="220" height="12" fill="#8b5cf6"/>
+        <text x="900" y="235" text-anchor="middle" fill="white" font-size="12" font-weight="700">instructor_reviews</text>
+        <text x="802" y="263" font-size="10" fill="#1e40af" font-weight="600">PK review_id BIGINT</text>
+        <text x="802" y="279" font-size="10" fill="#7c3aed" font-style="italic">FK instructor_id BIGINT</text>
+        <text x="802" y="295" font-size="10" fill="#7c3aed" font-style="italic">REF student_id BIGINT</text>
+        <text x="802" y="311" font-size="10" fill="#374151">rating INT(1-5), comment TEXT</text>
+
+        <line x1="900" y1="200" x2="900" y2="215" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#erArrow)"/>
+        <text x="908" y="210" font-size="8" fill="#94a3b8">1:N</text>
+
+        <!-- Cross-service: courses.instructor_id -> instructors -->
+        <path d="M 760 116 L 790 116" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#erArrow)"/>
+        <text x="768" y="112" font-size="7" fill="#94a3b8">N:1</text>
+
+        <!-- ENROLLMENT DB -->
+        <rect x="20" y="420" width="240" height="160" rx="8" fill="white" stroke="#f59e0b" stroke-width="2"/>
+        <rect x="20" y="420" width="240" height="28" rx="8" fill="#f59e0b"/>
+        <rect x="20" y="436" width="240" height="12" fill="#f59e0b"/>
+        <text x="140" y="440" text-anchor="middle" fill="white" font-size="12" font-weight="700">enrollments (enrollment_db)</text>
+        <text x="32" y="468" font-size="10" fill="#1e40af" font-weight="600">PK enrollment_id BIGINT</text>
+        <text x="32" y="484" font-size="10" fill="#7c3aed" font-style="italic">REF student_id BIGINT</text>
+        <text x="32" y="500" font-size="10" fill="#7c3aed" font-style="italic">REF course_id BIGINT</text>
+        <text x="32" y="516" font-size="10" fill="#374151">enrolled_at DATETIME</text>
+        <text x="32" y="532" font-size="10" fill="#374151">status ENUM(ACTIVE,COMPLETED,...)</text>
+        <text x="32" y="548" font-size="10" fill="#374151">payment_id, amount_paid</text>
+
+        <rect x="20" y="595" width="240" height="100" rx="8" fill="white" stroke="#f59e0b" stroke-width="2"/>
+        <rect x="20" y="595" width="240" height="28" rx="8" fill="#f59e0b"/>
+        <rect x="20" y="611" width="240" height="12" fill="#f59e0b"/>
+        <text x="140" y="615" text-anchor="middle" fill="white" font-size="12" font-weight="700">wishlists (enrollment_db)</text>
+        <text x="32" y="643" font-size="10" fill="#1e40af" font-weight="600">PK wishlist_id BIGINT</text>
+        <text x="32" y="659" font-size="10" fill="#7c3aed" font-style="italic">REF student_id, course_id</text>
+        <text x="32" y="675" font-size="10" fill="#374151">added_at DATETIME</text>
+
+        <!-- QUIZ DB -->
+        <rect x="290" y="420" width="220" height="130" rx="8" fill="white" stroke="#ec4899" stroke-width="2"/>
+        <rect x="290" y="420" width="220" height="28" rx="8" fill="#ec4899"/>
+        <rect x="290" y="436" width="220" height="12" fill="#ec4899"/>
+        <text x="400" y="440" text-anchor="middle" fill="white" font-size="12" font-weight="700">quizzes (quiz_db)</text>
+        <text x="302" y="468" font-size="10" fill="#1e40af" font-weight="600">PK quiz_id BIGINT</text>
+        <text x="302" y="484" font-size="10" fill="#7c3aed" font-style="italic">REF course_id BIGINT</text>
+        <text x="302" y="500" font-size="10" fill="#374151">title, description TEXT</text>
+        <text x="302" y="516" font-size="10" fill="#374151">total_marks, passing_marks</text>
+        <text x="302" y="532" font-size="10" fill="#374151">time_limit INT, is_active</text>
+
+        <rect x="290" y="565" width="220" height="130" rx="8" fill="white" stroke="#ec4899" stroke-width="2"/>
+        <rect x="290" y="565" width="220" height="28" rx="8" fill="#ec4899"/>
+        <rect x="290" y="581" width="220" height="12" fill="#ec4899"/>
+        <text x="400" y="585" text-anchor="middle" fill="white" font-size="12" font-weight="700">questions (quiz_db)</text>
+        <text x="302" y="613" font-size="10" fill="#1e40af" font-weight="600">PK question_id BIGINT</text>
+        <text x="302" y="629" font-size="10" fill="#7c3aed" font-style="italic">FK quiz_id BIGINT</text>
+        <text x="302" y="645" font-size="10" fill="#374151">question_text, options A-D</text>
+        <text x="302" y="661" font-size="10" fill="#374151">correct_option ENUM(A,B,C,D)</text>
+        <text x="302" y="677" font-size="10" fill="#374151">marks INT, order_index INT</text>
+
+        <line x1="400" y1="550" x2="400" y2="565" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#erArrow)"/>
+        <text x="408" y="560" font-size="8" fill="#94a3b8">1:N</text>
+
+        <rect x="540" y="490" width="220" height="130" rx="8" fill="white" stroke="#ec4899" stroke-width="2"/>
+        <rect x="540" y="490" width="220" height="28" rx="8" fill="#ec4899"/>
+        <rect x="540" y="506" width="220" height="12" fill="#ec4899"/>
+        <text x="650" y="510" text-anchor="middle" fill="white" font-size="12" font-weight="700">quiz_attempts (quiz_db)</text>
+        <text x="552" y="538" font-size="10" fill="#1e40af" font-weight="600">PK attempt_id BIGINT</text>
+        <text x="552" y="554" font-size="10" fill="#7c3aed" font-style="italic">FK quiz_id BIGINT</text>
+        <text x="552" y="570" font-size="10" fill="#7c3aed" font-style="italic">REF student_id BIGINT</text>
+        <text x="552" y="586" font-size="10" fill="#374151">score INT, is_passed BOOLEAN</text>
+        <text x="552" y="602" font-size="10" fill="#374151">attempt_number INT</text>
+
+        <line x1="510" y1="490" x2="540" y2="510" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#erArrow)"/>
+        <text x="518" y="495" font-size="8" fill="#94a3b8">1:N</text>
+
+        <!-- CERTIFICATE DB -->
+        <rect x="1040" y="20" width="240" height="180" rx="8" fill="white" stroke="#06b6d4" stroke-width="2"/>
+        <rect x="1040" y="20" width="240" height="28" rx="8" fill="#06b6d4"/>
+        <rect x="1040" y="36" width="240" height="12" fill="#06b6d4"/>
+        <text x="1160" y="40" text-anchor="middle" fill="white" font-size="12" font-weight="700">certificates (certificate_db)</text>
+        <text x="1052" y="68" font-size="10" fill="#1e40af" font-weight="600">PK certificate_id BIGINT</text>
+        <text x="1052" y="84" font-size="10" fill="#374151">certificate_code VARCHAR(50)</text>
+        <text x="1052" y="100" font-size="10" fill="#7c3aed" font-style="italic">REF student_id BIGINT</text>
+        <text x="1052" y="116" font-size="10" fill="#7c3aed" font-style="italic">REF course_id BIGINT</text>
+        <text x="1052" y="132" font-size="10" fill="#7c3aed" font-style="italic">REF instructor_id BIGINT</text>
+        <text x="1052" y="148" font-size="10" fill="#374151">student_name, course_name</text>
+        <text x="1052" y="164" font-size="10" fill="#374151">issued_at, certificate_url</text>
+        <text x="1052" y="180" font-size="10" fill="#374151">is_valid BOOLEAN</text>
+
+        <!-- Cross-service refs notation -->
+        <rect x="790" y="380" width="490" height="60" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="810" y="400" font-size="10" fill="#64748b" font-weight="600">Cross-Service References (via REST, not DB FK)</text>
+        <text x="810" y="420" font-size="9" fill="#94a3b8">REF = Logical reference resolved via RestTemplate API call (not a database foreign key)</text>
+        <text x="810" y="432" font-size="9" fill="#94a3b8">PK = Primary Key | FK = Same-database foreign key</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 8. PER-SERVICE DIAGRAMS -->
+<!-- ============================================================ -->
+<section id="svc-diagrams">
+  <h2><span class="icon">8.</span> Individual Service Diagrams</h2>
+  <p class="section-desc">Internals of each service showing endpoints, entities, dependencies, and data model</p>
+
+  <!-- PER-SERVICE DIAGRAMS - one SVG per service showing internal structure -->
+  <div class="diagram-container">
+    <div class="diagram-title" style="background:#fef2f2; color:#991b1b;">Auth Service &mdash; Internal Architecture</div>
+    <div class="diagram-body">
+      <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:900px;">
+        <!-- Controller -->
+        <rect x="20" y="20" width="250" height="180" rx="8" fill="white" stroke="#ef4444" stroke-width="2"/>
+        <rect x="20" y="20" width="250" height="26" rx="8" fill="#ef4444"/>
+        <rect x="20" y="34" width="250" height="12" fill="#ef4444"/>
+        <text x="145" y="38" text-anchor="middle" fill="white" font-size="11" font-weight="700">AuthController</text>
+        <text x="30" y="64" font-size="10" fill="#166534" font-weight="600">POST /register</text><text x="200" y="64" font-size="9" fill="#6b7280">PUBLIC</text>
+        <text x="30" y="82" font-size="10" fill="#166534" font-weight="600">POST /login</text><text x="200" y="82" font-size="9" fill="#6b7280">PUBLIC</text>
+        <text x="30" y="100" font-size="10" fill="#166534" font-weight="600">POST /logout</text><text x="200" y="100" font-size="9" fill="#6b7280">Bearer</text>
+        <text x="30" y="118" font-size="10" fill="#166534" font-weight="600">POST /introspect</text><text x="200" y="118" font-size="9" fill="#6b7280">Gateway</text>
+        <text x="30" y="136" font-size="10" fill="#1d4ed8" font-weight="600">GET /profile</text><text x="200" y="136" font-size="9" fill="#6b7280">Bearer</text>
+        <!-- Service layer -->
+        <rect x="320" y="40" width="160" height="40" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="400" y="65" text-anchor="middle" font-size="11" fill="#991b1b" font-weight="600">AuthService</text>
+        <line x1="270" y1="80" x2="320" y2="60" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#erArrow)"/>
+        <!-- Repos -->
+        <rect x="320" y="100" width="160" height="30" rx="6" fill="#f3f4f6" stroke="#d1d5db" stroke-width="1"/>
+        <text x="400" y="120" text-anchor="middle" font-size="10" fill="#374151">UserRepository</text>
+        <rect x="320" y="140" width="160" height="30" rx="6" fill="#f3f4f6" stroke="#d1d5db" stroke-width="1"/>
+        <text x="400" y="160" text-anchor="middle" font-size="10" fill="#374151">AccessTokenRepository</text>
+        <line x1="400" y1="80" x2="400" y2="100" stroke="#94a3b8" stroke-width="1" marker-end="url(#erArrow)"/>
+        <!-- DB -->
+        <rect x="540" y="60" width="160" height="130" rx="8" fill="white" stroke="#fbbf24" stroke-width="2"/>
+        <rect x="540" y="60" width="160" height="24" rx="8" fill="#fbbf24"/>
+        <rect x="540" y="72" width="160" height="12" fill="#fbbf24"/>
+        <text x="620" y="78" text-anchor="middle" fill="white" font-size="11" font-weight="700">auth_db</text>
+        <text x="555" y="105" font-size="10" fill="#374151" font-weight="600">users</text>
+        <text x="555" y="120" font-size="9" fill="#6b7280">user_id, username, email</text>
+        <text x="555" y="135" font-size="9" fill="#6b7280">password_hash, role</text>
+        <text x="555" y="155" font-size="10" fill="#374151" font-weight="600">access_tokens</text>
+        <text x="555" y="170" font-size="9" fill="#6b7280">token_id, token_value</text>
+        <text x="555" y="185" font-size="9" fill="#6b7280">user_id, expires_at</text>
+        <line x1="480" y1="120" x2="540" y2="120" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#erArrow)"/>
+        <!-- External caller -->
+        <rect x="740" y="60" width="140" height="40" rx="6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.5"/>
+        <text x="810" y="85" text-anchor="middle" font-size="10" fill="#3730a3" font-weight="600">API Gateway</text>
+        <line x1="740" y1="80" x2="700" y2="80" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#erArrow)"/>
+        <text x="712" y="74" font-size="8" fill="#6366f1">introspect</text>
+        <!-- Token info -->
+        <rect x="540" y="210" width="340" height="50" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+        <text x="555" y="230" font-size="10" fill="#166534" font-weight="600">Token Strategy: Opaque (UUID)</text>
+        <text x="555" y="246" font-size="9" fill="#6b7280">24-hour expiry | Stored in DB | Revocable via logout</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="diagram-container">
+    <div class="diagram-title" style="background:#eff6ff; color:#1e40af;">Student Service &mdash; Internal Architecture</div>
+    <div class="diagram-body">
+      <svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:900px;">
+        <rect x="20" y="20" width="280" height="220" rx="8" fill="white" stroke="#3b82f6" stroke-width="2"/>
+        <rect x="20" y="20" width="280" height="26" rx="8" fill="#3b82f6"/>
+        <rect x="20" y="34" width="280" height="12" fill="#3b82f6"/>
+        <text x="160" y="38" text-anchor="middle" fill="white" font-size="11" font-weight="700">StudentController</text>
+        <text x="30" y="64" font-size="9" fill="#166534" font-weight="600">POST /students</text><text x="235" y="64" font-size="8" fill="#6b7280">STU, ADM</text>
+        <text x="30" y="80" font-size="9" fill="#1d4ed8" font-weight="600">GET /students/{id}</text><text x="235" y="80" font-size="8" fill="#6b7280">Own/INS/ADM</text>
+        <text x="30" y="96" font-size="9" fill="#1d4ed8" font-weight="600">GET /students</text><text x="235" y="96" font-size="8" fill="#6b7280">INS, ADM</text>
+        <text x="30" y="112" font-size="9" fill="#92400e" font-weight="600">PUT /students/{id}</text><text x="235" y="112" font-size="8" fill="#6b7280">Own/ADM</text>
+        <text x="30" y="128" font-size="9" fill="#991b1b" font-weight="600">DELETE /students/{id}</text><text x="235" y="128" font-size="8" fill="#6b7280">ADM only</text>
+        <text x="30" y="144" font-size="9" fill="#1d4ed8" font-weight="600">GET /{id}/exists</text><text x="235" y="144" font-size="8" fill="#6b7280">Any</text>
+        <text x="30" y="164" font-size="9" fill="#166534" font-weight="600">POST /{id}/progress</text><text x="235" y="164" font-size="8" fill="#6b7280">Own/ADM</text>
+        <text x="30" y="180" font-size="9" fill="#1d4ed8" font-weight="600">GET /{id}/progress</text><text x="235" y="180" font-size="8" fill="#6b7280">Own/INS/ADM</text>
+        <text x="30" y="196" font-size="9" fill="#1d4ed8" font-weight="600">GET /{id}/progress/{cid}</text><text x="235" y="196" font-size="8" fill="#6b7280">Own/INS/ADM</text>
+        <!-- DB -->
+        <rect x="380" y="40" width="170" height="100" rx="8" fill="white" stroke="#fbbf24" stroke-width="2"/>
+        <rect x="380" y="40" width="170" height="24" rx="8" fill="#fbbf24"/>
+        <rect x="380" y="52" width="170" height="12" fill="#fbbf24"/>
+        <text x="465" y="58" text-anchor="middle" fill="white" font-size="11" font-weight="700">student_db</text>
+        <text x="395" y="82" font-size="10" fill="#374151" font-weight="600">students</text>
+        <text x="395" y="108" font-size="10" fill="#374151" font-weight="600">student_progress</text>
+        <line x1="300" y1="90" x2="380" y2="80" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#erArrow)"/>
+        <!-- Callers -->
+        <rect x="620" y="30" width="180" height="30" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="710" y="50" text-anchor="middle" font-size="10" fill="#92400e" font-weight="600">Enrollment Svc (caller)</text>
+        <rect x="620" y="70" width="180" height="30" rx="6" fill="#cffafe" stroke="#06b6d4" stroke-width="1.5"/>
+        <text x="710" y="90" text-anchor="middle" font-size="10" fill="#0e7490" font-weight="600">Certificate Svc (caller)</text>
+        <line x1="620" y1="45" x2="550" y2="75" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#erArrow)"/>
+        <line x1="620" y1="85" x2="550" y2="80" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#erArrow)"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="diagram-container">
+    <div class="diagram-title" style="background:#ecfdf5; color:#166534;">Course Service &mdash; Internal Architecture</div>
+    <div class="diagram-body">
+      <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:900px;">
+        <rect x="20" y="20" width="300" height="250" rx="8" fill="white" stroke="#10b981" stroke-width="2"/>
+        <rect x="20" y="20" width="300" height="26" rx="8" fill="#10b981"/>
+        <rect x="20" y="34" width="300" height="12" fill="#10b981"/>
+        <text x="170" y="38" text-anchor="middle" fill="white" font-size="11" font-weight="700">CourseController + CategoryController</text>
+        <text x="30" y="64" font-size="9" fill="#166534" font-weight="600">POST /courses</text><text x="250" y="64" font-size="8" fill="#6b7280">INS, ADM</text>
+        <text x="30" y="80" font-size="9" fill="#1d4ed8" font-weight="600">GET /courses, /{id}, /search</text><text x="250" y="80" font-size="8" fill="#6b7280">Any</text>
+        <text x="30" y="96" font-size="9" fill="#1d4ed8" font-weight="600">GET /courses/all</text><text x="250" y="96" font-size="8" fill="#6b7280">INS, ADM</text>
+        <text x="30" y="112" font-size="9" fill="#92400e" font-weight="600">PUT /courses/{id}</text><text x="250" y="112" font-size="8" fill="#6b7280">Own/ADM</text>
+        <text x="30" y="128" font-size="9" fill="#92400e" font-weight="600">PUT /{id}/publish</text><text x="250" y="128" font-size="8" fill="#6b7280">Own/ADM</text>
+        <text x="30" y="144" font-size="9" fill="#991b1b" font-weight="600">DELETE /courses/{id}</text><text x="250" y="144" font-size="8" fill="#6b7280">Own/ADM</text>
+        <text x="30" y="164" font-size="9" fill="#166534" font-weight="600">POST /{id}/lessons</text><text x="250" y="164" font-size="8" fill="#6b7280">INS, ADM</text>
+        <text x="30" y="180" font-size="9" fill="#1d4ed8" font-weight="600">GET /{id}/lessons</text><text x="250" y="180" font-size="8" fill="#6b7280">Any</text>
+        <text x="30" y="196" font-size="9" fill="#92400e" font-weight="600">PUT /lessons/{id}</text><text x="250" y="196" font-size="8" fill="#6b7280">INS, ADM</text>
+        <text x="30" y="216" font-size="9" fill="#166534" font-weight="600">POST /categories</text><text x="250" y="216" font-size="8" fill="#6b7280">ADM only</text>
+        <text x="30" y="232" font-size="9" fill="#92400e" font-weight="600">PUT/DELETE /categories/{id}</text><text x="250" y="232" font-size="8" fill="#6b7280">ADM only</text>
+        <text x="30" y="248" font-size="9" fill="#1d4ed8" font-weight="600">GET /categories, /{id}/exists</text><text x="250" y="248" font-size="8" fill="#6b7280">Any</text>
+        <!-- DB -->
+        <rect x="400" y="40" width="170" height="120" rx="8" fill="white" stroke="#fbbf24" stroke-width="2"/>
+        <rect x="400" y="40" width="170" height="24" rx="8" fill="#fbbf24"/>
+        <rect x="400" y="52" width="170" height="12" fill="#fbbf24"/>
+        <text x="485" y="58" text-anchor="middle" fill="white" font-size="11" font-weight="700">course_db</text>
+        <text x="415" y="82" font-size="10" fill="#374151" font-weight="600">courses</text>
+        <text x="415" y="102" font-size="10" fill="#374151" font-weight="600">lessons</text>
+        <text x="415" y="122" font-size="10" fill="#374151" font-weight="600">course_categories</text>
+        <line x1="320" y1="100" x2="400" y2="90" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#erArrow)"/>
+        <!-- Callers -->
+        <rect x="640" y="40" width="180" height="30" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="730" y="60" text-anchor="middle" font-size="10" fill="#92400e" font-weight="600">Enrollment Svc (caller)</text>
+        <rect x="640" y="80" width="180" height="30" rx="6" fill="#cffafe" stroke="#06b6d4" stroke-width="1.5"/>
+        <text x="730" y="100" text-anchor="middle" font-size="10" fill="#0e7490" font-weight="600">Certificate Svc (caller)</text>
+        <line x1="640" y1="55" x2="570" y2="70" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#erArrow)"/>
+        <line x1="640" y1="95" x2="570" y2="80" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#erArrow)"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="diagram-container">
+    <div class="diagram-title" style="background:#f5f3ff; color:#6d28d9;">Instructor Service &mdash; Internal Architecture</div>
+    <div class="diagram-body">
+      <svg viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:900px;">
+        <rect x="20" y="20" width="280" height="200" rx="8" fill="white" stroke="#8b5cf6" stroke-width="2"/>
+        <rect x="20" y="20" width="280" height="26" rx="8" fill="#8b5cf6"/>
+        <rect x="20" y="34" width="280" height="12" fill="#8b5cf6"/>
+        <text x="160" y="38" text-anchor="middle" fill="white" font-size="11" font-weight="700">InstructorController</text>
+        <text x="30" y="64" font-size="9" fill="#166534" font-weight="600">POST /instructors</text><text x="230" y="64" font-size="8" fill="#6b7280">INS, ADM</text>
+        <text x="30" y="80" font-size="9" fill="#1d4ed8" font-weight="600">GET /instructors/{id}</text><text x="230" y="80" font-size="8" fill="#6b7280">Any</text>
+        <text x="30" y="96" font-size="9" fill="#1d4ed8" font-weight="600">GET /instructors</text><text x="230" y="96" font-size="8" fill="#6b7280">Any</text>
+        <text x="30" y="112" font-size="9" fill="#92400e" font-weight="600">PUT /instructors/{id}</text><text x="230" y="112" font-size="8" fill="#6b7280">Own/ADM</text>
+        <text x="30" y="128" font-size="9" fill="#991b1b" font-weight="600">DELETE /instructors/{id}</text><text x="230" y="128" font-size="8" fill="#6b7280">ADM only</text>
+        <text x="30" y="144" font-size="9" fill="#1d4ed8" font-weight="600">GET /{id}/exists</text><text x="230" y="144" font-size="8" fill="#6b7280">Any</text>
+        <text x="30" y="164" font-size="9" fill="#166534" font-weight="600">POST /{id}/reviews</text><text x="230" y="164" font-size="8" fill="#6b7280">STU only</text>
+        <text x="30" y="180" font-size="9" fill="#1d4ed8" font-weight="600">GET /{id}/reviews</text><text x="230" y="180" font-size="8" fill="#6b7280">Any</text>
+        <!-- DB -->
+        <rect x="380" y="40" width="170" height="100" rx="8" fill="white" stroke="#fbbf24" stroke-width="2"/>
+        <rect x="380" y="40" width="170" height="24" rx="8" fill="#fbbf24"/>
+        <rect x="380" y="52" width="170" height="12" fill="#fbbf24"/>
+        <text x="465" y="58" text-anchor="middle" fill="white" font-size="11" font-weight="700">instructor_db</text>
+        <text x="395" y="82" font-size="10" fill="#374151" font-weight="600">instructors</text>
+        <text x="395" y="97" font-size="9" fill="#6b7280">profiles, expertise, ratings</text>
+        <text x="395" y="115" font-size="10" fill="#374151" font-weight="600">instructor_reviews</text>
+        <text x="395" y="130" font-size="9" fill="#6b7280">student ratings &amp; comments</text>
+        <line x1="300" y1="90" x2="380" y2="80" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#erArrow)"/>
+        <!-- Caller: Certificate Service -->
+        <rect x="620" y="60" width="180" height="30" rx="6" fill="#cffafe" stroke="#06b6d4" stroke-width="1.5"/>
+        <text x="710" y="80" text-anchor="middle" font-size="10" fill="#0e7490" font-weight="600">Certificate Svc (reads instructor)</text>
+        <line x1="620" y1="75" x2="550" y2="80" stroke="#06b6d4" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#erArrow)"/>
+        <!-- Info box -->
+        <rect x="380" y="160" width="400" height="50" rx="8" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>
+        <text x="395" y="180" font-size="10" fill="#6d28d9" font-weight="600">Ownership: Instructors edit own profile only (requireOwnershipOrAdmin)</text>
+        <text x="395" y="196" font-size="9" fill="#6b7280">Reviews: Only STUDENT role can submit. Rating auto-recalculated on new review.</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="diagram-container">
+    <div class="diagram-title" style="background:#fef3c7; color:#92400e;">Enrollment Service &mdash; Internal Architecture (Orchestrator)</div>
+    <div class="diagram-body">
+      <svg viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:900px;">
+        <rect x="20" y="20" width="280" height="200" rx="8" fill="white" stroke="#f59e0b" stroke-width="2"/>
+        <rect x="20" y="20" width="280" height="26" rx="8" fill="#f59e0b"/>
+        <rect x="20" y="34" width="280" height="12" fill="#f59e0b"/>
+        <text x="160" y="38" text-anchor="middle" fill="white" font-size="11" font-weight="700">EnrollmentController</text>
+        <text x="30" y="64" font-size="9" fill="#166534" font-weight="600">POST /enroll</text><text x="230" y="64" font-size="8" fill="#6b7280">STU only</text>
+        <text x="30" y="80" font-size="9" fill="#1d4ed8" font-weight="600">GET /student/{id}</text><text x="230" y="80" font-size="8" fill="#6b7280">Own/INS/ADM</text>
+        <text x="30" y="96" font-size="9" fill="#1d4ed8" font-weight="600">GET /course/{id}</text><text x="230" y="96" font-size="8" fill="#6b7280">INS, ADM</text>
+        <text x="30" y="112" font-size="9" fill="#92400e" font-weight="600">PUT /complete</text><text x="230" y="112" font-size="8" fill="#6b7280">ADM/SYS</text>
+        <text x="30" y="128" font-size="9" fill="#92400e" font-weight="600">PUT /drop</text><text x="230" y="128" font-size="8" fill="#6b7280">STU, ADM</text>
+        <text x="30" y="144" font-size="9" fill="#1d4ed8" font-weight="600">GET /check</text><text x="230" y="144" font-size="8" fill="#6b7280">Any</text>
+        <text x="30" y="164" font-size="9" fill="#166534" font-weight="600">POST /wishlist</text><text x="230" y="164" font-size="8" fill="#6b7280">STU only</text>
+        <text x="30" y="180" font-size="9" fill="#1d4ed8" font-weight="600">GET /wishlist</text><text x="230" y="180" font-size="8" fill="#6b7280">STU, ADM</text>
+        <text x="30" y="196" font-size="9" fill="#991b1b" font-weight="600">DELETE /wishlist</text><text x="230" y="196" font-size="8" fill="#6b7280">STU, ADM</text>
+        <!-- Outbound calls -->
+        <rect x="380" y="20" width="150" height="30" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+        <text x="455" y="40" text-anchor="middle" font-size="10" fill="#1e40af" font-weight="600">Student Svc :8082</text>
+        <rect x="380" y="60" width="150" height="30" rx="6" fill="#dcfce7" stroke="#10b981" stroke-width="1.5"/>
+        <text x="455" y="80" text-anchor="middle" font-size="10" fill="#166534" font-weight="600">Course Svc :8083</text>
+        <rect x="380" y="100" width="150" height="30" rx="6" fill="#cffafe" stroke="#06b6d4" stroke-width="1.5"/>
+        <text x="455" y="120" text-anchor="middle" font-size="10" fill="#0e7490" font-weight="600">Certificate Svc :8087</text>
+        <line x1="300" y1="60" x2="380" y2="35" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#erArrow)"/>
+        <line x1="300" y1="75" x2="380" y2="75" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#erArrow)"/>
+        <line x1="300" y1="110" x2="380" y2="115" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#erArrow)"/>
+        <!-- Quiz caller -->
+        <rect x="380" y="160" width="150" height="30" rx="6" fill="#fce7f3" stroke="#ec4899" stroke-width="1.5"/>
+        <text x="455" y="180" text-anchor="middle" font-size="10" fill="#9d174d" font-weight="600">Quiz Svc (caller)</text>
+        <line x1="380" y1="175" x2="300" y2="115" stroke="#ec4899" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#erArrow)"/>
+        <!-- DB -->
+        <rect x="600" y="50" width="160" height="90" rx="8" fill="white" stroke="#fbbf24" stroke-width="2"/>
+        <rect x="600" y="50" width="160" height="24" rx="8" fill="#fbbf24"/>
+        <rect x="600" y="62" width="160" height="12" fill="#fbbf24"/>
+        <text x="680" y="68" text-anchor="middle" fill="white" font-size="11" font-weight="700">enrollment_db</text>
+        <text x="615" y="95" font-size="10" fill="#374151" font-weight="600">enrollments</text>
+        <text x="615" y="115" font-size="10" fill="#374151" font-weight="600">wishlists</text>
+        <line x1="530" y1="80" x2="600" y2="80" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#erArrow)"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="diagram-container">
+    <div class="diagram-title" style="background:#fce7f3; color:#9d174d;">Quiz Service &mdash; Internal Architecture</div>
+    <div class="diagram-body">
+      <svg viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:900px;">
+        <rect x="20" y="20" width="280" height="180" rx="8" fill="white" stroke="#ec4899" stroke-width="2"/>
+        <rect x="20" y="20" width="280" height="26" rx="8" fill="#ec4899"/>
+        <rect x="20" y="34" width="280" height="12" fill="#ec4899"/>
+        <text x="160" y="38" text-anchor="middle" fill="white" font-size="11" font-weight="700">QuizController</text>
+        <text x="30" y="64" font-size="9" fill="#166534" font-weight="600">POST /quizzes</text><text x="230" y="64" font-size="8" fill="#6b7280">INS, ADM</text>
+        <text x="30" y="80" font-size="9" fill="#1d4ed8" font-weight="600">GET /course/{id}</text><text x="230" y="80" font-size="8" fill="#6b7280">Any</text>
+        <text x="30" y="96" font-size="9" fill="#1d4ed8" font-weight="600">GET /{id}</text><text x="230" y="96" font-size="8" fill="#6b7280">Any</text>
+        <text x="30" y="112" font-size="9" fill="#166534" font-weight="600">POST /{id}/questions</text><text x="230" y="112" font-size="8" fill="#6b7280">INS, ADM</text>
+        <text x="30" y="128" font-size="9" fill="#1d4ed8" font-weight="600">GET /{id}/questions</text><text x="230" y="128" font-size="8" fill="#6b7280">Any</text>
+        <text x="30" y="148" font-size="9" fill="#166534" font-weight="600">POST /submit</text><text x="230" y="148" font-size="8" fill="#6b7280">STU only</text>
+        <text x="30" y="164" font-size="9" fill="#1d4ed8" font-weight="600">GET /attempts/student/{id}</text><text x="230" y="164" font-size="8" fill="#6b7280">Own/INS/ADM</text>
+        <text x="30" y="180" font-size="9" fill="#1d4ed8" font-weight="600">GET /{id}/attempts/{sid}</text><text x="230" y="180" font-size="8" fill="#6b7280">Own/INS/ADM</text>
+        <!-- Outbound -->
+        <rect x="380" y="40" width="150" height="30" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="455" y="60" text-anchor="middle" font-size="10" fill="#92400e" font-weight="600">Enrollment Svc :8085</text>
+        <line x1="300" y1="140" x2="380" y2="55" stroke="#ec4899" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#erArrow)"/>
+        <text x="330" y="90" font-size="8" fill="#ec4899">mark complete</text>
+        <!-- DB -->
+        <rect x="600" y="30" width="160" height="110" rx="8" fill="white" stroke="#fbbf24" stroke-width="2"/>
+        <rect x="600" y="30" width="160" height="24" rx="8" fill="#fbbf24"/>
+        <rect x="600" y="42" width="160" height="12" fill="#fbbf24"/>
+        <text x="680" y="48" text-anchor="middle" fill="white" font-size="11" font-weight="700">quiz_db</text>
+        <text x="615" y="75" font-size="10" fill="#374151" font-weight="600">quizzes</text>
+        <text x="615" y="95" font-size="10" fill="#374151" font-weight="600">questions</text>
+        <text x="615" y="115" font-size="10" fill="#374151" font-weight="600">quiz_attempts</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="diagram-container">
+    <div class="diagram-title" style="background:#cffafe; color:#0e7490;">Certificate Service &mdash; Internal Architecture</div>
+    <div class="diagram-body">
+      <svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:900px;">
+        <rect x="20" y="20" width="280" height="140" rx="8" fill="white" stroke="#06b6d4" stroke-width="2"/>
+        <rect x="20" y="20" width="280" height="26" rx="8" fill="#06b6d4"/>
+        <rect x="20" y="34" width="280" height="12" fill="#06b6d4"/>
+        <text x="160" y="38" text-anchor="middle" fill="white" font-size="11" font-weight="700">CertificateController</text>
+        <text x="30" y="64" font-size="9" fill="#166534" font-weight="600">POST /issue</text><text x="230" y="64" font-size="8" fill="#6b7280">ADM/SYS</text>
+        <text x="30" y="84" font-size="9" fill="#1d4ed8" font-weight="600">GET /student/{id}</text><text x="230" y="84" font-size="8" fill="#6b7280">Own/INS/ADM</text>
+        <text x="30" y="104" font-size="9" fill="#1d4ed8" font-weight="600">GET /verify/{code}</text><text x="230" y="104" font-size="8" fill="#6b7280">Any</text>
+        <text x="30" y="124" font-size="9" fill="#92400e" font-weight="600">PUT /{id}/revoke</text><text x="230" y="124" font-size="8" fill="#6b7280">ADM only</text>
+        <!-- Outbound -->
+        <rect x="380" y="20" width="150" height="30" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+        <text x="455" y="40" text-anchor="middle" font-size="10" fill="#1e40af" font-weight="600">Student Svc :8082</text>
+        <rect x="380" y="60" width="150" height="30" rx="6" fill="#dcfce7" stroke="#10b981" stroke-width="1.5"/>
+        <text x="455" y="80" text-anchor="middle" font-size="10" fill="#166534" font-weight="600">Course Svc :8083</text>
+        <line x1="300" y1="50" x2="380" y2="35" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#erArrow)"/>
+        <line x1="300" y1="70" x2="380" y2="75" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#erArrow)"/>
+        <!-- Caller -->
+        <rect x="380" y="110" width="150" height="30" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="455" y="130" text-anchor="middle" font-size="10" fill="#92400e" font-weight="600">Enrollment Svc (caller)</text>
+        <line x1="380" y1="125" x2="300" y2="70" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#erArrow)"/>
+        <!-- DB -->
+        <rect x="620" y="40" width="160" height="70" rx="8" fill="white" stroke="#fbbf24" stroke-width="2"/>
+        <rect x="620" y="40" width="160" height="24" rx="8" fill="#fbbf24"/>
+        <rect x="620" y="52" width="160" height="12" fill="#fbbf24"/>
+        <text x="700" y="58" text-anchor="middle" fill="white" font-size="11" font-weight="700">certificate_db</text>
+        <text x="635" y="82" font-size="10" fill="#374151" font-weight="600">certificates</text>
+        <text x="635" y="97" font-size="9" fill="#6b7280">CERT-YYYY-NNNN codes</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<section style="background: var(--gray-50); text-align: center; padding: 24px; border: none; box-shadow: none;">
+  <p style="color: var(--gray-500); font-size: 0.85rem; margin: 0;">
+    LearnHub Online Learning Platform &mdash; System Architecture Report<br>
+    IT4020: Modern Topics in IT | SLIIT | April 2026
+  </p>
+</section>
+
+</div> <!-- /container -->
+</body>
+</html>

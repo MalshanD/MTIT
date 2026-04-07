@@ -1,0 +1,142 @@
+# ==========================================
+# API Gateway Configuration
+# ==========================================
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      # ==========================================
+      # Route Definitions - Maps URL paths to services
+      # ==========================================
+      routes:
+
+        # ========== Swagger/OpenAPI Doc Routes ==========
+        # These routes proxy each service's API docs through the Gateway
+        # so the aggregated Swagger UI can fetch them
+
+        - id: auth-service-docs
+          uri: http://localhost:8081
+          predicates:
+            - Path=/services/auth/v3/api-docs/**
+          filters:
+            - RewritePath=/services/auth/(?<remaining>.*), /${remaining}
+
+        - id: student-service-docs
+          uri: http://localhost:8082
+          predicates:
+            - Path=/services/student/v3/api-docs/**
+          filters:
+            - RewritePath=/services/student/(?<remaining>.*), /${remaining}
+
+        - id: course-service-docs
+          uri: http://localhost:8083
+          predicates:
+            - Path=/services/course/v3/api-docs/**
+          filters:
+            - RewritePath=/services/course/(?<remaining>.*), /${remaining}
+
+        - id: instructor-service-docs
+          uri: http://localhost:8084
+          predicates:
+            - Path=/services/instructor/v3/api-docs/**
+          filters:
+            - RewritePath=/services/instructor/(?<remaining>.*), /${remaining}
+
+        - id: enrollment-service-docs
+          uri: http://localhost:8085
+          predicates:
+            - Path=/services/enrollment/v3/api-docs/**
+          filters:
+            - RewritePath=/services/enrollment/(?<remaining>.*), /${remaining}
+
+        - id: quiz-service-docs
+          uri: http://localhost:8086
+          predicates:
+            - Path=/services/quiz/v3/api-docs/**
+          filters:
+            - RewritePath=/services/quiz/(?<remaining>.*), /${remaining}
+
+        - id: certificate-service-docs
+          uri: http://localhost:8087
+          predicates:
+            - Path=/services/certificate/v3/api-docs/**
+          filters:
+            - RewritePath=/services/certificate/(?<remaining>.*), /${remaining}
+
+        # ========== API Routes (Business Logic) ==========
+
+        # ---------- Auth Service (port 8081) ----------
+        - id: auth-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/auth/**
+
+        # ---------- Student Service (port 8082) ----------
+        - id: student-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/students/**
+
+        # ---------- Course Service (port 8083) ----------
+        - id: course-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/courses/**
+
+        # ---------- Instructor Service (port 8084) ----------
+        - id: instructor-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/instructors/**
+
+        # ---------- Enrollment Service (port 8085) ----------
+        - id: enrollment-service
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/enrollments/**
+
+        # ---------- Quiz Service (port 8086) ----------
+        - id: quiz-service
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/quizzes/**
+
+        # ---------- Certificate Service (port 8087) ----------
+        - id: certificate-service
+          uri: http://localhost:8087
+          predicates:
+            - Path=/api/certificates/**
+
+      # Global CORS configuration
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+
+# ==========================================
+# Auth Service URL (used by AuthenticationFilter)
+# ==========================================
+auth:
+  service:
+    url: http://localhost:8081
+
+# ==========================================
+# Logging
+# ==========================================
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    com.onlinelearning.gateway: DEBUG
